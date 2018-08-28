@@ -1,4 +1,4 @@
-package map;
+package util;
 
 public final class Scale {
 	

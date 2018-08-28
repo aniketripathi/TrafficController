@@ -1,15 +1,12 @@
 package entities;
 
 import entities.Lane.LaneDirection;
-import javafx.scene.shape.Shape;
+import util.Region;
 
 public  class Vehicle {
 	
-	public static enum TYPE {
-		CAR, TWO_WHEELER, HEAVY_VEHICLE;
-	}
 	
-	private Shape shape;
+	
 	private double velocityX;
     private double velocityY;
     private double accelerationX;
@@ -19,21 +16,43 @@ public  class Vehicle {
     private Lane currentLane;
     private Lane destinationLane;
     private LaneDirection currentDirection;
+    private Region region;
     
     
     
     
+    public Vehicle(double width, double height) {
+    	velocityX = 0;
+    	velocityY = 0;
+    	accelerationX = 0;
+    	accelerationY = 0;
+    	currentRoad = null;
+    	destinationRoad = null;
+    	currentLane = null;
+    	destinationLane = null;
+    	currentDirection = null;
+    	region = new Region(0,0, width, height);
+    }
     
     
     
+    public void reset() {
+    	
+    	velocityX = 0;
+    	velocityY = 0;
+    	accelerationX = 0;
+    	accelerationY = 0;
+    	currentRoad = null;
+    	destinationRoad = null;
+    	currentLane = null;
+    	destinationLane = null;
+    	currentDirection = null;
+    	region.setX(0);
+    	region.setY(0);
+    	
+    }
     
-    
-	public Shape getShape() {
-		return shape;
-	}
-	public void setShape(Shape shape) {
-		this.shape = shape;
-	}
+	
 	public double getVelocityX() {
 		return velocityX;
 	}

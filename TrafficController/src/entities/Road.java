@@ -8,6 +8,8 @@ public class Road {
 	private int numberOfLanes;
 	private Lane[] forwardLanes;
 	private Lane[] backwardLanes;
+	private TrafficLight trafficLight;
+	
 	
 	public Road(int numberOfLanes) {
 	if(numberOfLanes < 1)
@@ -16,7 +18,46 @@ public class Road {
 		this.numberOfLanes = numberOfLanes;
 		forwardLanes = new Lane[numberOfLanes];
 		backwardLanes = new Lane[numberOfLanes];
+		trafficLight = new TrafficLight();
+		
 	}
+	
+	
+	
+	public void createAllLanes() {
+		
+		for(int i = 0; i < numberOfLanes; i++) {
+			forwardLanes[i] = new Lane(LaneDirection.FORWARD);
+			backwardLanes[i] = new Lane(LaneDirection.BACKWARD);
+		}
+		
+		
+	}
+	
+	
+	public void setLane(LaneDirection direction, Lane lane, int index) {
+		if(direction == LaneDirection.FORWARD) {
+			forwardLanes[index] = lane;
+		}
+		
+		else if(direction == LaneDirection.BACKWARD) {
+			backwardLanes[index] = lane;
+		}
+	}
+	
+	
+	public Lane getLane(LaneDirection direction, int index) {
+		Lane lane = null;
+		if(direction == LaneDirection.FORWARD) {
+			lane = forwardLanes[index];
+		}
+		
+		else if(direction == LaneDirection.BACKWARD) {
+			lane = backwardLanes[index];
+		}
+		return lane;
+	}
+	
 	
 	
 	public int getNumberOfLanes() {

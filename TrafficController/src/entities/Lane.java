@@ -17,21 +17,26 @@ public class Lane {
 		FORWARD, BACKWARD;
 	};
 
-	private TrafficLight light;
+	// 1- close to divider, 2 - away from divider
+	
 	private List<Vehicle> queue;
 	private LaneDirection direction;
    // private static final int queueSize = 100;	
 	
 	
-	public Lane(Shape shape, TrafficLight light, LaneDirection direction) {
+	public Lane(Shape shape, LaneDirection direction) {
 		this.shape = shape;
-		this.light = light;
 		this.direction = direction;
 		queue = new LinkedList<Vehicle>();
 	}
 
 
-
+   public Lane(LaneDirection direction) {
+	   this(null, direction);
+   }
+	
+	
+	
 	/**
 	 * 
 	 * @param graphics
@@ -43,13 +48,6 @@ public class Lane {
 	
 	
 	
-	public TrafficLight getLight() {
-		return light;
-	}
-
-	public void setLight(TrafficLight light) {
-		this.light = light;
-	}
 
 	public List<Vehicle> getQueue() {
 		return queue;

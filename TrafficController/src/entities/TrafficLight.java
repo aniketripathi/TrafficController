@@ -1,27 +1,29 @@
 package entities;
 
-import javafx.scene.shape.Shape;
 
 public class TrafficLight {
 	
-	public static enum Color {
+	public static enum LightColor {
 		RED,
 		GREEN;
 	}
-	private Shape light;
+	
 	private boolean enabled = false;
-	private Color color;
+	private LightColor color;
 	private double timer;
-	public static final Color DEFAULT_COLOR = Color.RED;
+	public static final LightColor DEFAULT_COLOR = LightColor.RED;
 	
 	
 	
-	public TrafficLight(Shape light, boolean enabled) {
-		super();
-		this.light = light;
+	public TrafficLight(boolean enabled) {
 		this.enabled = enabled;
 		this.timer = 0;
 		this.color = DEFAULT_COLOR;
+	}
+	
+	
+	public TrafficLight() {
+		this(false);
 	}
 	
 	
@@ -31,22 +33,17 @@ public class TrafficLight {
 	public void setTimer(double timer) {
 		this.timer = timer;
 	}
-	public Shape getLight() {
-		return light;
-	}
-	public void setLight(Shape light) {
-		this.light = light;
-	}
+	
 	public boolean isEnabled() {
 		return enabled;
 	}
 	public void setEnabled(boolean enabled) {
 		this.enabled = enabled;
 	}
-	public Color getColor() {
+	public LightColor getColor() {
 		return color;
 	}
-	public void setColor(Color color) {
+	public void setColor(LightColor color) {
 		this.color = color;
 	}
 	
