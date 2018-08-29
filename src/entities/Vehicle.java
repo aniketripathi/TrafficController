@@ -1,6 +1,6 @@
 package entities;
 
-import entities.Lane.LaneDirection;
+
 import util.Region;
 
 public  class Vehicle {
@@ -15,7 +15,6 @@ public  class Vehicle {
     private Road destinationRoad;
     private Lane currentLane;
     private Lane destinationLane;
-    private LaneDirection currentDirection;
     private Region region;
     
     
@@ -30,8 +29,12 @@ public  class Vehicle {
     	destinationRoad = null;
     	currentLane = null;
     	destinationLane = null;
-    	currentDirection = null;
     	region = new Region(0,0, width, height);
+    }
+    
+    
+    public Vehicle() {
+    	this(0,0);
     }
     
     
@@ -46,7 +49,6 @@ public  class Vehicle {
     	destinationRoad = null;
     	currentLane = null;
     	destinationLane = null;
-    	currentDirection = null;
     	region.setX(0);
     	region.setY(0);
     	
@@ -100,12 +102,6 @@ public  class Vehicle {
 	}
 	public void setDestinationLane(Lane destinationLane) {
 		this.destinationLane = destinationLane;
-	}
-	public LaneDirection getCurrentDirection() {
-		return currentDirection;
-	}
-	public void setCurrentDirection(LaneDirection currentDirection) {
-		this.currentDirection = currentDirection;
 	}
     
     

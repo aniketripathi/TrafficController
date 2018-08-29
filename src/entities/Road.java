@@ -1,13 +1,13 @@
 package entities;
 
-import entities.Lane.LaneDirection;
-import javafx.scene.shape.Shape;
+
+
 
 public class Road {
 
 	private int numberOfLanes;
-	private Lane[] forwardLanes;
-	private Lane[] backwardLanes;
+	private ForwardLane[] forwardLanes;
+	private BackwardLane[] backwardLanes;
 	private TrafficLight trafficLight;
 	
 	
@@ -16,8 +16,8 @@ public class Road {
 		throw new IllegalArgumentException("The numberOfLanes must be greater than 0");
 	
 		this.numberOfLanes = numberOfLanes;
-		forwardLanes = new Lane[numberOfLanes];
-		backwardLanes = new Lane[numberOfLanes];
+		forwardLanes = new ForwardLane[numberOfLanes];
+		backwardLanes = new BackwardLane[numberOfLanes];
 		trafficLight = new TrafficLight();
 		
 	}
@@ -27,35 +27,33 @@ public class Road {
 	public void createAllLanes() {
 		
 		for(int i = 0; i < numberOfLanes; i++) {
-			forwardLanes[i] = new Lane(LaneDirection.FORWARD);
-			backwardLanes[i] = new Lane(LaneDirection.BACKWARD);
+			forwardLanes[i] = new ForwardLane();
+			backwardLanes[i] = new BackwardLane();
 		}
 		
 		
 	}
 	
 	
-	public void setLane(LaneDirection direction, Lane lane, int index) {
-		if(direction == LaneDirection.FORWARD) {
+	public void setForwardLane(ForwardLane lane, int index) {
 			forwardLanes[index] = lane;
-		}
 		
-		else if(direction == LaneDirection.BACKWARD) {
-			backwardLanes[index] = lane;
-		}
 	}
 	
 	
-	public Lane getLane(LaneDirection direction, int index) {
-		Lane lane = null;
-		if(direction == LaneDirection.FORWARD) {
-			lane = forwardLanes[index];
-		}
-		
-		else if(direction == LaneDirection.BACKWARD) {
-			lane = backwardLanes[index];
-		}
-		return lane;
+	public void setBackwardLane(BackwardLane lane, int index) {
+		backwardLanes[index] = lane;
+	
+}
+	
+	
+	public ForwardLane getForwardLane(int index) {
+		return forwardLanes[index];
+	}
+	
+	
+	public BackwardLane getBackwardLane(int index) {
+		return backwardLanes[index];
 	}
 	
 	
@@ -63,37 +61,17 @@ public class Road {
 	public int getNumberOfLanes() {
 		return numberOfLanes;
 	}
-	
-	
-	public void setLaneShapes(LaneDirection direction, Shape ... shapes) {
-		
-		if(direction == LaneDirection.FORWARD) {
-		
-			for(int i = 0; i < shapes.length; i++)	
-				forwardLanes[i].setShape(shapes[i]);
-			
-		}
-			
-			else if(direction == LaneDirection.BACKWARD) {
-		
-			for(int i = 0; i < shapes.length; i++)
-				backwardLanes[i].setShape(shapes[i]);
-			}
-		
-		
-		}
-	
-	
-	
-	public void setLaneShapeAt(LaneDirection direction, Shape shape, int index) {
-		
-		if(direction == LaneDirection.FORWARD) {
-			forwardLanes[index].setShape(shape);
-		}
-		
-		else if(direction == LaneDirection.BACKWARD) {
-			backwardLanes[index].setShape(shape);
-		}	
+
+
+
+	public TrafficLight getTrafficLight() {
+		return trafficLight;
+	}
+
+
+
+	public void setTrafficLight(TrafficLight trafficLight) {
+		this.trafficLight = trafficLight;
 	}
 	
 	

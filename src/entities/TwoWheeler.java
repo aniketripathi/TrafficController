@@ -7,4 +7,11 @@ public class TwoWheeler extends Vehicle{
 		// TODO Auto-generated constructor stub
 	}
 
+	public TwoWheeler() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+	
+	
+
 }

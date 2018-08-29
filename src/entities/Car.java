@@ -7,4 +7,10 @@ public class Car extends Vehicle {
 		// TODO Auto-generated constructor stub
 	}
 
+	public Car() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+	
+
 }

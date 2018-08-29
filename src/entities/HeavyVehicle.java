@@ -7,4 +7,11 @@ public class HeavyVehicle extends Vehicle{
 		// TODO Auto-generated constructor stub
 	}
 
+	public HeavyVehicle() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+	
+	
+
 }
