@@ -55,10 +55,10 @@ public class ConfigWriter {
 	public static List<String> writeToList(Config config) {
 		List<String> list = new LinkedList<String>();
 
-		roadWriter(TOP_ROAD, config.getTopRoadProperty());
-		roadWriter(BOTTOM_ROAD, config.getBottomRoadProperty());
-		roadWriter(LEFT_ROAD, config.getLeftRoadProperty());
-		roadWriter(RIGHT_ROAD, config.getRightRoadProperty());
+		list.addAll(roadWriter(TOP_ROAD, config.getTopRoadProperty()));
+		list.addAll(roadWriter(BOTTOM_ROAD, config.getBottomRoadProperty()));
+		list.addAll(roadWriter(LEFT_ROAD, config.getLeftRoadProperty()));
+		list.addAll(roadWriter(RIGHT_ROAD, config.getRightRoadProperty()));
 
 		return list;
 	}
