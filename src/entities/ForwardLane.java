@@ -4,8 +4,8 @@ import javafx.scene.shape.Line;
 import javafx.scene.shape.Path;
 import util.Region;
 
-public class ForwardLane extends Lane{
-	
+public class ForwardLane extends Lane {
+
 	/**
 	 * The line coordinates where this lane ends
 	 */
@@ -33,6 +33,5 @@ public class ForwardLane extends Lane{
 	public void setExitBarrier(Line exitBarrier) {
 		this.exitBarrier = exitBarrier;
 	}
- 
-	
+
 }

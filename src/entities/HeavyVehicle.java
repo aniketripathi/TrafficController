@@ -1,6 +1,6 @@
 package entities;
 
-public class HeavyVehicle extends Vehicle{
+public class HeavyVehicle extends Vehicle {
 
 	public HeavyVehicle(double width, double height) {
 		super(width, height);
@@ -11,7 +11,5 @@ public class HeavyVehicle extends Vehicle{
 		super();
 		// TODO Auto-generated constructor stub
 	}
-	
-	
 
 }

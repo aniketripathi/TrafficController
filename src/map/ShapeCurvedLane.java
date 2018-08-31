@@ -4,11 +4,11 @@ import javafx.scene.shape.Arc;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.Shape;
 
-public class ShapeCurvedLane extends Shape{
+public class ShapeCurvedLane extends Shape {
 	private Rectangle rectangle;
 	private Arc arc;
 	private double arcWidth;
-	
+
 	public ShapeCurvedLane(Rectangle rectangle, Arc arc, double arcWidth) {
 		this.rectangle = rectangle;
 		this.arc = arc;
@@ -38,9 +38,5 @@ public class ShapeCurvedLane extends Shape{
 	public void setArcWidth(double arcWidth) {
 		this.arcWidth = arcWidth;
 	}
-	
-	
-	
-	
-	
+
 }

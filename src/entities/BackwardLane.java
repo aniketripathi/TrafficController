@@ -4,8 +4,8 @@ import javafx.scene.shape.Line;
 import javafx.scene.shape.Path;
 import util.Region;
 
-public class BackwardLane extends Lane{
-	
+public class BackwardLane extends Lane {
+
 	/**
 	 * The line coordinates from where this lane starts
 	 */
@@ -33,8 +33,5 @@ public class BackwardLane extends Lane{
 	public void setEntryBarrier(Line entryBarrier) {
 		this.entryBarrier = entryBarrier;
 	}
-	
-	
 
 }
-	

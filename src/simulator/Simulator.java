@@ -1,37 +1,17 @@
 package simulator;
 
-
-
-import javafx.animation.AnimationTimer;
+import javafx.animation.Transition;
 
 public class Simulator {
 
-	private class AnimationController extends AnimationTimer {
+	private class AnimationController extends Transition {
 
 		@Override
-		public void handle(long arg0) {
-			
+		protected void interpolate(double arg0) {
+			// TODO Auto-generated method stub
+
 		}
-		
+
 	}
-	
-	
-	AnimationController simulator;
-	private boolean isPaused;
-	private boolean isStopped;
-	
-	public void pause() {
-		simulator.stop();
-		isPaused = true;
-		isStopped = false;
-	}
-	
-	
-	public void play() {
-		simulator.start();
-		isPaused = false;
-		isStopped = true;
-	}
-	
 
 }
