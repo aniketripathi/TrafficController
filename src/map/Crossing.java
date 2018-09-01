@@ -1,0 +1,95 @@
+package map;
+
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
+
+import entities.BackwardLane;
+import entities.ForwardLane;
+import javafx.scene.shape.Path;
+import util.Region;
+
+public class Crossing {
+
+	private class LanePair {
+
+		private ForwardLane forwardLane;
+		private BackwardLane backwardLane;
+
+		public LanePair(ForwardLane forwardLane, BackwardLane backwardLane) {
+			super();
+			this.forwardLane = forwardLane;
+			this.backwardLane = backwardLane;
+		}
+
+		public ForwardLane getForwardLane() {
+			return forwardLane;
+		}
+
+		public BackwardLane getBackwardLane() {
+			return backwardLane;
+		}
+
+	}
+
+	private Region region;
+	private int numberOfLanePairs;
+	private HashMap<LanePair, Path> paths;
+	private Set<LanePair> lanePairs;
+
+	public static final int DEFAULT_NUMBER_OF_LANE_PAIRS = 16;
+
+	public Crossing() {
+		region = new Region();
+		paths = new HashMap<LanePair, Path>();
+		lanePairs = new HashSet<LanePair>(numberOfLanePairs);
+		numberOfLanePairs = DEFAULT_NUMBER_OF_LANE_PAIRS;
+	}
+
+	public boolean addPath(ForwardLane forwardLane, BackwardLane backwardLane, Path path) {
+
+		boolean successful = false;
+		if (getLanePair(forwardLane, backwardLane) == null) {
+			LanePair lanePair = new LanePair(forwardLane, backwardLane);
+			lanePairs.add(lanePair);
+			paths.put(lanePair, path);
+			successful = true;
+		}
+
+		return successful;
+	}
+
+	private LanePair getLanePair(ForwardLane forwardLane, BackwardLane backwardLane) {
+		LanePair lanePair = null;
+		Iterator<LanePair> iterator = lanePairs.iterator();
+		while (iterator.hasNext()) {
+			LanePair temp = iterator.next();
+			if (temp.getForwardLane().equals(forwardLane) && temp.getBackwardLane().equals(backwardLane)) {
+				lanePair = temp;
+			}
+		}
+		return lanePair;
+	}
+
+	public Path getPath(ForwardLane forwardLane, BackwardLane backwardLane) {
+		return paths.get(getLanePair(forwardLane, backwardLane));
+	}
+
+	public Region getRegion() {
+		return region;
+	}
+
+	public void setRegion(Region region) {
+		this.region = region;
+	}
+
+	public int getNumberOfLanePairs() {
+		return numberOfLanePairs;
+	}
+
+	public void setNumberOfLanePairs(int numberOfLanePairs) {
+		this.numberOfLanePairs = numberOfLanePairs;
+	}
+
+}

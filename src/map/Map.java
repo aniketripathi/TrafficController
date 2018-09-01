@@ -36,132 +36,57 @@ public class Map {
 		 * @param laneWidth
 		 * @return
 		 */
-	/*
-	 * private Map createMap(double width, double height, double laneWidth, double
-	 * crossingRadius, double sideLaneRadius, double dividerWidth) {
-	 * 
-	 * Map map = null;
-	 * 
-	 * //set number of lanes numberOfLanes = DEFAULT_NUMBER_OF_LANES;
-	 * 
-	 * // set height this.width = width; this.height = height;
-	 * 
-	 * // call constructor for roads topRoad = new Road(numberOfLanes); bottomRoad =
-	 * new Road(numberOfLanes); leftRoad = new Road(numberOfLanes); rightRoad = new
-	 * Road(numberOfLanes);
-	 * 
-	 *//**** Create Shapes ****/
-	/*
-	 * 
-	 * //1. create 8 horizontal lane shapes and 8 vertical lane shapes double
-	 * topLeftEndX = (height/2) - (3 * laneWidth) + (dividerWidth/2); double
-	 * topLeftEndY = (width/2) - (3 * laneWidth) + (dividerWidth/2); double
-	 * horizontalLaneWidth = (width/2) - laneWidth; double verticalLaneWidth =
-	 * (height/2) - laneWidth;
-	 * 
-	 * Shape leftRoadLaneForward2 = new Rectangle(0, topLeftEndY + laneWidth,
-	 * horizontalLaneWidth, laneWidth ); Shape leftRoadLaneForward1 = new
-	 * Rectangle(0, topLeftEndY + 2*laneWidth, horizontalLaneWidth, laneWidth );
-	 * Shape leftRoadLaneBackward1 = new Rectangle(0, topLeftEndY + 3*laneWidth +
-	 * dividerWidth , horizontalLaneWidth, laneWidth ); Shape leftRoadLaneBackward2
-	 * = new Rectangle(0, topLeftEndY + 4*laneWidth + dividerWidth,
-	 * horizontalLaneWidth, laneWidth );
-	 * 
-	 * Shape rightRoadLaneForward2 = new Rectangle(width/2 + laneWidth +
-	 * dividerWidth/2, topLeftEndY + laneWidth, horizontalLaneWidth, laneWidth );
-	 * Shape rightRoadLaneForward1 = new Rectangle(width/2 + laneWidth +
-	 * dividerWidth/2, topLeftEndY + 2*laneWidth, horizontalLaneWidth, laneWidth );
-	 * Shape rightRoadLaneBackward1 = new Rectangle(width/2 + laneWidth +
-	 * dividerWidth/2, topLeftEndY + 3*laneWidth + dividerWidth ,
-	 * horizontalLaneWidth, laneWidth ); Shape rightRoadLaneBackward2 = new
-	 * Rectangle(width/2 + laneWidth + dividerWidth/2, topLeftEndY + 4*laneWidth +
-	 * dividerWidth, horizontalLaneWidth, laneWidth );
-	 * 
-	 * 
-	 * Shape topRoadLaneForward2 = new Rectangle(topLeftEndX + laneWidth, 0,
-	 * laneWidth, verticalLaneWidth ); Shape topRoadLaneForward1 = new
-	 * Rectangle(topLeftEndX + 2*laneWidth, 0, laneWidth, verticalLaneWidth ); Shape
-	 * topRoadLaneBackward1 = new Rectangle(topLeftEndX + 3*laneWidth +
-	 * dividerWidth, 0, laneWidth, verticalLaneWidth ); Shape topRoadLaneBackward2 =
-	 * new Rectangle(topLeftEndX + 4*laneWidth + dividerWidth, 0, laneWidth,
-	 * verticalLaneWidth );
-	 * 
-	 * Shape bottomRoadLaneForward2 = new Rectangle(topLeftEndX + laneWidth,
-	 * height/2 + laneWidth + dividerWidth/2, laneWidth, verticalLaneWidth ); Shape
-	 * bottomRoadLaneForward1 = new Rectangle(topLeftEndX + 2*laneWidth, height/2 +
-	 * laneWidth + dividerWidth/2, laneWidth, verticalLaneWidth ); Shape
-	 * bottomRoadLaneBackward1 = new Rectangle(topLeftEndX + 3*laneWidth +
-	 * dividerWidth, height/2 + laneWidth + dividerWidth/2, laneWidth,
-	 * verticalLaneWidth ); Shape bottomRoadLaneBackward2 = new
-	 * Rectangle(topLeftEndX + 4*laneWidth + dividerWidth, height/2 + laneWidth +
-	 * dividerWidth/2, laneWidth, verticalLaneWidth );
-	 * 
-	 * 
-	 * //2.Create 8 curved lane shapes Shape leftRoadLaneForward3 = new
-	 * ShapeCurvedLane(new Rectangle(), new Arc(), laneWidth); Shape
-	 * leftRoadLaneBackward3 = new ShapeCurvedLane(new Rectangle(), new Arc(),
-	 * laneWidth); Shape rightRoadLaneForward3 = new ShapeCurvedLane(new
-	 * Rectangle(), new Arc(), laneWidth); Shape rightRoadLaneBackward3 = new
-	 * ShapeCurvedLane(new Rectangle(), new Arc(), laneWidth); Shape
-	 * topRoadLaneForward3 = new ShapeCurvedLane(new Rectangle(), new Arc(),
-	 * laneWidth); Shape topRoadLaneBackward3 = new ShapeCurvedLane(new Rectangle(),
-	 * new Arc(), laneWidth); Shape bottomRoadLaneForward3 = new ShapeCurvedLane(new
-	 * Rectangle(), new Arc(), laneWidth); Shape bottomRoadLaneBackward3 = new
-	 * ShapeCurvedLane(new Rectangle(), new Arc(), laneWidth);
-	 * 
-	 * 
-	 * 
-	 * //3. Shape for area crossing Shape crossing = new Circle(width/2, height/2,
-	 * crossingRadius);
-	 * 
-	 *//*** End creating shapes ***/
-	/*	
 	
-	
-	*//** Create Lanes **/
-
-	/*
-	 * topRoad.createAllLanes(); bottomRoad.createAllLanes();
-	 * leftRoad.createAllLanes(); rightRoad.createAllLanes();
-	 * 
-	 * 
-	 *//*** Set shapes to their respective objects **//*
-														 * topRoad.setLaneShapes(LaneDirection.FORWARD,
-														 * topRoadLaneForward1, topRoadLaneForward2,
-														 * topRoadLaneForward3);
-														 * bottomRoad.setLaneShapes(LaneDirection.FORWARD,
-														 * bottomRoadLaneForward1, bottomRoadLaneForward2,
-														 * bottomRoadLaneForward3);
-														 * leftRoad.setLaneShapes(LaneDirection.FORWARD,
-														 * leftRoadLaneForward1, leftRoadLaneForward2,
-														 * leftRoadLaneForward3);
-														 * rightRoad.setLaneShapes(LaneDirection.FORWARD,
-														 * rightRoadLaneForward1, rightRoadLaneForward2,
-														 * rightRoadLaneForward3);
-														 * 
-														 * topRoad.setLaneShapes(LaneDirection.BACKWARD,
-														 * topRoadLaneBackward1, topRoadLaneBackward2,
-														 * topRoadLaneBackward3);
-														 * bottomRoad.setLaneShapes(LaneDirection.BACKWARD,
-														 * bottomRoadLaneBackward1, bottomRoadLaneBackward2,
-														 * bottomRoadLaneBackward3);
-														 * leftRoad.setLaneShapes(LaneDirection.BACKWARD,
-														 * leftRoadLaneBackward1, leftRoadLaneBackward2,
-														 * leftRoadLaneBackward3);
-														 * rightRoad.setLaneShapes(LaneDirection.BACKWARD,
-														 * rightRoadLaneBackward1, rightRoadLaneBackward2,
-														 * rightRoadLaneBackward3);
-														 * 
-														 * 
-														 * 
-														 * return map;
-														 * 
-														 * 
-														 * }
-														 */
+	  private Map createMap(double width, double height, double laneWidth, double crossingRadius, double sideLaneRadius, double dividerWidth) {
+	  
+	  Map map = null;
+	  numberOfLanes = DEFAULT_NUMBER_OF_LANES;
+	  
+	  /** Create Roads **/
+	  
+	  Road topRoad = new Road(numberOfLanes);
+	  Road bottomRoad = new Road(numberOfLanes);
+	  Road leftRoad = new Road(numberOfLanes);
+	  Road rightRoad = new Road(numberOfLanes);
+	  
+	  /** Set Regions for all the lanes for all roads **/
+	  
+	  double roadWidth = 6 * laneWidth + dividerWidth;
+	  double verticalRoadHeight = (height - roadWidth)/2;
+	  double horizontalRoadHeight = (width - roadWidth)/2;
+	  
+	  /** Set regions for curves explicitly.
+	   *  Here width and height are considered with respect to canvas and not considering the orientation or direction of roads.
+	   * **/
+	  for(int i = 0; i < numberOfLanes; i++) {
+		  
+		  topRoad.getForwardLane(i).getRegion().setAll((width+dividerWidth+laneWidth)/2 + i*laneWidth, verticalRoadHeight/2, laneWidth, verticalRoadHeight);
+		  topRoad.getBackwardLane(i).getRegion().setAll((width-dividerWidth-laneWidth)/2 - i*laneWidth, verticalRoadHeight/2, laneWidth, verticalRoadHeight);
+		 
+		  bottomRoad.getForwardLane(i).getRegion().setAll((width-dividerWidth-laneWidth)/2 - i*laneWidth, height - verticalRoadHeight/2, laneWidth, verticalRoadHeight);
+		  bottomRoad.getBackwardLane(i).getRegion().setAll((width+dividerWidth+laneWidth)/2 + i*laneWidth, height - verticalRoadHeight/2, laneWidth, verticalRoadHeight);
+		 
+		  leftRoad.getForwardLane(i).getRegion().setAll(horizontalRoadHeight/2, (height - dividerWidth - laneWidth)/2 - i* laneWidth, horizontalRoadHeight, laneWidth);
+		  leftRoad.getBackwardLane(i).getRegion().setAll(horizontalRoadHeight/2, (height + dividerWidth + laneWidth)/2 + i* laneWidth, horizontalRoadHeight, laneWidth);
+		  
+		  rightRoad.getForwardLane(i).getRegion().setAll(horizontalRoadHeight/2, (height + dividerWidth + laneWidth)/2 + i* laneWidth, horizontalRoadHeight, laneWidth);
+		  rightRoad.getBackwardLane(i).getRegion().setAll(horizontalRoadHeight/2, (height - dividerWidth - laneWidth)/2 - i* laneWidth, horizontalRoadHeight, laneWidth);
+		  
+	  }
+	  
+	  /** TODO Set traffic light region for all roads **/
+	  
+	  Crossing crossing= new Crossing();
+	  crossing.getRegion().setAll(width/2, height/2, roadWidth, roadWidth);
+	  /** set paths for crossing TODO here**/
+	  
+	  
+	  
+	  
+	return map;
+	  }
 
 	public Map getMap() {
-
 		return null;
 	}
 
