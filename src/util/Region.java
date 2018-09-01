@@ -71,6 +71,14 @@ public class Region {
 		return (Math.abs(a - b) < THRESHOLD);
 	}
 
+	
+	public void setAll(double x, double y, double width, double height) {
+		this.x = x;
+		this.y = y;
+		this.width = width;
+		this.height = height;
+	}
+	
 	/**
 	 * Returns the center x coordinate of the region
 	 */
