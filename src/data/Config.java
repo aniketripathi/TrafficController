@@ -33,11 +33,8 @@ public class Config {
 			rate = new SimpleDoubleProperty(DEFAULT_RATE);
 		}
 
-		private void validate(double changedValue, double otherValue1, double otherValue2) throws ProbabilityException {
-			if (changedValue < 0)
-				throw new ProbabilityException(ProbabilityException.CODE.NEGATIVE);
-
-			if (Math.abs(changedValue + otherValue1 + otherValue2 - 1) > THRESHOLD) {
+		public void validate() throws ProbabilityException {
+			if (Math.abs(carProbability.get() + twoWheelerProbability.get() + heavyVehicleProbability.get() - 1) > THRESHOLD) {
 				throw new ProbabilityException(ProbabilityException.CODE.BEYOND_RANGE);
 			}
 		}
@@ -47,7 +44,6 @@ public class Config {
 		}
 
 		public void setCarProbability(double carProbability) {
-			validate(carProbability, twoWheelerProbability.get(), heavyVehicleProbability.get());
 			this.carProbability.set(carProbability);
 		}
 
@@ -56,7 +52,6 @@ public class Config {
 		}
 
 		public void setTwoWheelerProbability(double twoWheelerProbability) {
-			validate(twoWheelerProbability, carProbability.get(), heavyVehicleProbability.get());
 			this.twoWheelerProbability.set(twoWheelerProbability);
 		}
 
@@ -65,7 +60,6 @@ public class Config {
 		}
 
 		public void setHeavyVehicleProbability(double heavyVehicleProbability) {
-			validate(heavyVehicleProbability, twoWheelerProbability.get(), carProbability.get());
 			this.heavyVehicleProbability.set(heavyVehicleProbability);
 		}
 
@@ -106,15 +100,29 @@ public class Config {
 		public static final int DEFAULT_NUMBER_OF_LANES = 3;
 
 		public RoadProperty(int numberOfLanes) {
-
+			
+			this.numberOfLanes = numberOfLanes;
 			rate = new SimpleDoubleProperty(DEFAULT_RATE);
 			lanesProperty = new LaneProperty[numberOfLanes];
 
 			for (int i = 0; i < lanesProperty.length; i++) {
 				LaneProperty laneProperty = new LaneProperty();
 				laneProperty.getRateProbabilityProperty().addListener(this);
+				lanesProperty[i] = laneProperty;
 			}
 
+		}
+		
+		public void validate() throws InvalidConfigException {
+			
+			double sumOfLanesRate = 0;
+			for(LaneProperty lane: lanesProperty) {
+				lane.validate();
+				sumOfLanesRate += lane.getRate();
+			}
+			final double THRESHOLD = 0.00001;
+			if(Math.abs(sumOfLanesRate - rate.get()) < THRESHOLD )
+				throw new InvalidConfigException(InvalidConfigException.INVALID_VALUE_MESSAGE);
 		}
 
 		public double getRate() {
@@ -144,6 +152,7 @@ public class Config {
 			this.rate.set(rate);
 
 		}
+		
 
 		public LaneProperty getLaneProperty(int index) {
 			return lanesProperty[index];
@@ -193,7 +202,14 @@ public class Config {
 	public RoadProperty getRightRoadProperty() {
 		return rightRoadProperty;
 	}
-
+	
+	public void validate() throws InvalidConfigException {
+		topRoadProperty.validate();
+		bottomRoadProperty.validate();
+		leftRoadProperty.validate();
+		rightRoadProperty.validate();
+	}
+	
 	public void loadFromFile(Path file) throws IOException, InvalidConfigException {
 		ConfigReader.readFromFile(file, this);
 

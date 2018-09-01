@@ -46,7 +46,7 @@ public class ConfigWriter {
 		for (int i = 0; i < roadProperty.getNumberOfLanes(); i++)
 			list.addAll(laneWriter(i, roadProperty.getLaneProperty(i)));
 
-		list.add(END_ROAD + TERMINAL);
+		list.add(END_ROAD + TERMINAL + System.lineSeparator());
 
 		return list;
 
