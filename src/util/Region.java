@@ -71,14 +71,13 @@ public class Region {
 		return (Math.abs(a - b) < THRESHOLD);
 	}
 
-	
 	public void setAll(double x, double y, double width, double height) {
 		this.x = x;
 		this.y = y;
 		this.width = width;
 		this.height = height;
 	}
-	
+
 	/**
 	 * Returns the center x coordinate of the region
 	 */
@@ -192,16 +191,20 @@ public class Region {
 	 * @param stroke          Paint attribute for stroke
 	 * @param strokeLineWidth Width of the stroke line
 	 */
-	public void draw(GraphicsContext graphic, Paint fill, Paint stroke, double strokeLineWidth) {
+	public void draw(GraphicsContext graphic, Paint fill, Paint strokePaint, double strokeLineWidth, boolean stroke) {
 		graphic.save();
-		graphic.rect(this.x - this.width, this.y - this.height, this.width, this.height);
+		graphic.beginPath();
+		graphic.rect(this.x - this.width / 2, this.y - this.height / 2, this.width, this.height);
 		graphic.setFill(fill);
-		graphic.setStroke(stroke);
-		graphic.setLineWidth(strokeLineWidth);
-		graphic.closePath();
 		graphic.fill();
-		graphic.stroke();
+		if (stroke) {
+			graphic.setStroke(strokePaint);
+			graphic.setLineWidth(strokeLineWidth);
+			graphic.stroke();
+		}
+		graphic.closePath();
 		graphic.restore();
+
 	}
 
 }

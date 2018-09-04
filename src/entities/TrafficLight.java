@@ -1,11 +1,22 @@
 package entities;
 
+import javafx.scene.paint.Color;
 import util.Region;
 
 public class TrafficLight {
 
 	public static enum LightColor {
-		RED, GREEN;
+		RED(Color.RED), GREEN(Color.GREEN);
+
+		private Color color;
+
+		LightColor(Color color) {
+			this.color = color;
+		}
+
+		public Color getColor() {
+			return color;
+		}
 	}
 
 	private boolean enabled = false;
