@@ -3,7 +3,6 @@ package data;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 
@@ -16,15 +15,16 @@ public class ConfigReader {
 	private static void validateList(List<String> list) throws InvalidConfigException {
 
 		ListIterator<String> iterator = list.listIterator();
-		
+
 		while (iterator.hasNext()) {
 			String stm = iterator.next();
 			if (stm.trim().isEmpty())
 				iterator.remove();
 			else if (!stm.endsWith(ConfigWriter.TERMINAL))
 				throw new InvalidConfigException(InvalidConfigException.INVALID_STATEMENT_MESSAGE);
-			
-			else iterator.set(stm.substring(0, stm.length() - 1));
+
+			else
+				iterator.set(stm.substring(0, stm.length() - 1));
 		}
 	}
 
@@ -85,7 +85,7 @@ public class ConfigReader {
 					int laneIndex = Integer.parseInt(stmt.substring(stmt.indexOf(ConfigWriter.SEPARATOR) + 1));
 					LaneProperty laneProperty = roadProperty.getLaneProperty(laneIndex);
 					laneReader(laneProperty, list.subList(iterator.nextIndex(), list.size()));
-				
+
 				}
 			}
 		} catch (NumberFormatException e) {
@@ -102,7 +102,7 @@ public class ConfigReader {
 		while (iterator.hasNext()) {
 
 			String stmt = iterator.next();
-			stmt = stmt.substring(stmt.indexOf(ConfigWriter.SEPARATOR)+1);
+			stmt = stmt.substring(stmt.indexOf(ConfigWriter.SEPARATOR) + 1);
 			if (stmt.equalsIgnoreCase(ConfigWriter.TOP_ROAD)) {
 				roadReader(config.getTopRoadProperty(), list.subList(iterator.nextIndex(), list.size()));
 			} else if (stmt.equalsIgnoreCase(ConfigWriter.BOTTOM_ROAD)) {
