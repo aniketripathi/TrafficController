@@ -2,12 +2,14 @@ package data;
 
 import javafx.beans.property.LongProperty;
 import javafx.beans.property.SimpleLongProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 
-public class VehicleCount {
-	private LongProperty car;
-	private LongProperty twoWheeler;
-	private LongProperty heavyVehicle;
-	private LongProperty total;
+public class VehicleCount implements ChangeListener<Number>{
+	private final LongProperty car;
+	private final LongProperty twoWheeler;
+	private final LongProperty heavyVehicle;
+	private final LongProperty total;
 
 	public VehicleCount() {
 		car = new SimpleLongProperty(0);
@@ -24,9 +26,9 @@ public class VehicleCount {
 		total.set(0);
 	}
 
-	public LongProperty getCarProperty() {
-		return car;
-	}
+	//public LongProperty getCarProperty() {
+	//	return car;
+//	}
 
 	public LongProperty getTwoWheelerProperty() {
 		return car;
@@ -36,34 +38,39 @@ public class VehicleCount {
 		return car;
 	}
 
+	public LongProperty getTotalProperty() {
+		return total;
+	}
+
 	public void incrementCarCount() {
 		car.set(car.get() + 1);
-		total.set(total.get() + 1);
 	}
 
 	public void decrementCarCount() {
 		car.set(car.get() - 1);
-		total.set(total.get() - 1);
 
 	}
 
 	public void incrementTwoWheelerCount() {
 		twoWheeler.set(twoWheeler.get() + 1);
-		total.set(total.get() + 1);
+		
 	}
 
 	public void decrementTwoWheelerCount() {
 		twoWheeler.set(twoWheeler.get() - 1);
-		total.set(total.get() - 1);
 	}
 
 	public void incrementheavyVehicleCount() {
 		heavyVehicle.set(heavyVehicle.get() + 1);
-		total.set(total.get() + 1);
 	}
 
 	public void decrementHeavyVehicleCount() {
 		heavyVehicle.set(heavyVehicle.get() + 1);
-		total.set(total.get() - 1);
+	}
+
+	@Override
+	public void changed(ObservableValue<? extends Number> arg0, Number arg1, Number arg2) {
+		total.set(car.get() + twoWheeler.get() + heavyVehicle.get());
+		
 	}
 }
