@@ -3,6 +3,7 @@ package application;
 import java.net.URL;
 import java.util.ResourceBundle;
 import map.Map;
+import simulator.Simulator;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
@@ -12,7 +13,6 @@ import javafx.scene.control.ButtonBar;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.ToolBar;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
@@ -63,7 +63,9 @@ public class Controller implements Initializable, ChangeListener<Number> {
 
 		map = new Map(canvas.getWidth(), canvas.getHeight(), 20, 6, 10);
 		map.setGC(canvas.getGraphicsContext2D());
-		map.draw(canvas.getGraphicsContext2D());
+		
+		Simulator sim = new Simulator(map, canvas.getGraphicsContext2D());
+		sim.play();
 
 		canvas.widthProperty().addListener(obser -> {
 			map.getWidthProperty().set(canvas.getWidth());

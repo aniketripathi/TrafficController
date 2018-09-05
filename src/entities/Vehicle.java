@@ -109,4 +109,15 @@ public class Vehicle {
 		this.destinationLane = destinationLane;
 	}
 
+	
+	
+	public Region getRegion() {
+		return region;
+	}
+
+	public void setRegion(Region region) {
+		this.region = region;
+	}
+	
+	
 }

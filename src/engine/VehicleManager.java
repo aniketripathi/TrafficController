@@ -6,21 +6,50 @@ import entities.Car;
 import entities.HeavyVehicle;
 import entities.TwoWheeler;
 import entities.Vehicle;
+import util.Compare;
 
 public class VehicleManager {
 
 	private LinkedList<Car> carPool;
 	private LinkedList<TwoWheeler> twoWheelerPool;
 	private LinkedList<HeavyVehicle> heavyVehiclePool;
-
+	
 	public VehicleManager() {
 
 		carPool = new LinkedList<Car>();
 		twoWheelerPool = new LinkedList<TwoWheeler>();
 		heavyVehiclePool = new LinkedList<HeavyVehicle>();
 
-	}
 
+	}
+	
+	public  Vehicle getVehicle(double carProbability, double twoWheelerProbability, double heavyVehicleProbability, long carCount, long twoWheelerCount, long heavyVehicleCount){
+		Vehicle vehicle = null;
+		
+		if(carCount == 0 && twoWheelerCount == 0 && heavyVehicleCount == 0) {
+			vehicle = getCar();
+		}
+		else {
+			long sum =  carCount + twoWheelerCount + heavyVehicleCount;
+			double carStat = carProbability - ((double)carCount)/sum, twoWheelerStat = twoWheelerProbability - ((double)twoWheelerCount)/sum, heavyVehicleStat = heavyVehicleProbability - ((double)heavyVehicleCount)/sum;
+			double max = Math.max(carStat, Math.max(twoWheelerStat, heavyVehicleStat));
+			
+			if(Compare.isEqual(max, carStat)) {
+				vehicle = getCar();
+			}
+			
+			else if(Compare.isEqual(max, twoWheelerStat)) {
+				vehicle = getTwoWheeler();
+			}
+			
+			else if(Compare.isEqual(max, heavyVehicleStat)) {
+				vehicle = getHeavyVehicle();
+			}
+		}
+		
+		return vehicle;
+	}
+	
 	public boolean isCarPoolEmpty() {
 		return carPool.isEmpty();
 	}
