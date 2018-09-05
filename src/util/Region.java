@@ -30,11 +30,6 @@ public class Region {
 	 */
 	private double height;
 
-	/**
-	 * The maximum difference value tolerated when comparing doubles. Thus if x and
-	 * y are not equal only if they differ more than the threshold value.
-	 */
-	private static final double THRESHOLD = 0.000001;
 
 	public Region(double x, double y, double width, double height) {
 		this.x = x;
@@ -58,19 +53,7 @@ public class Region {
 		this.height = region.height;
 	}
 
-	private boolean isLarger(double a, double b) {
-		return ((a - b) > THRESHOLD);
-
-	}
-
-	private boolean isSmaller(double a, double b) {
-		return !(isLarger(a, b) || isEqual(a, b));
-	}
-
-	private boolean isEqual(double a, double b) {
-		return (Math.abs(a - b) < THRESHOLD);
-	}
-
+	
 	public void setAll(double x, double y, double width, double height) {
 		this.x = x;
 		this.y = y;
@@ -147,19 +130,19 @@ public class Region {
 	}
 
 	public boolean isCoinciding(Region region) {
-		return (isEqual(this.x, region.x) && isEqual(this.y, region.y));
+		return (Compare.isEqual(this.x, region.x) && Compare.isEqual(this.y, region.y));
 	}
 
 	public boolean isColliding(Region region) {
-		return (isLarger((this.width / 2 + region.width / 2), (this.getX() - region.x))
-				&& isLarger((this.height / 2 + region.height / 2), (this.getY() - region.y)));
+		return (Compare.isLarger((this.width / 2 + region.width / 2), (this.getX() - region.x))
+				&& Compare.isLarger((this.height / 2 + region.height / 2), (this.getY() - region.y)));
 	}
 
 	public boolean isInsideOf(Region region) {
-		return (isSmaller(this.getX() + this.width / 2, region.x + region.width / 2)
-				&& isSmaller(this.getY() + this.height / 2, region.y + region.height / 2)
-				&& isLarger(this.getX() - this.width / 2, region.x - region.width / 2)
-				&& isLarger(this.getY() - this.height / 2, region.y - region.height / 2));
+		return (Compare.isSmaller(this.getX() + this.width / 2, region.x + region.width / 2)
+				&& Compare.isSmaller(this.getY() + this.height / 2, region.y + region.height / 2)
+				&& Compare.isLarger(this.getX() - this.width / 2, region.x - region.width / 2)
+				&& Compare.isLarger(this.getY() - this.height / 2, region.y - region.height / 2));
 	}
 
 	public boolean isOutsideOf(Region region) {
@@ -167,8 +150,8 @@ public class Region {
 	}
 
 	public boolean isInside(double x, double y) {
-		return (isSmaller(x, this.getX() + this.width / 2) && isLarger(x, this.getX() - this.width / 2)
-				&& isSmaller(y, this.getY() + this.height / 2) && isLarger(y, this.getY() - this.height / 2));
+		return (Compare.isSmaller(x, this.getX() + this.width / 2) && Compare.isLarger(x, this.getX() - this.width / 2)
+				&& Compare.isSmaller(y, this.getY() + this.height / 2) && Compare.isLarger(y, this.getY() - this.height / 2));
 	}
 
 	public boolean isOutside(int x, int y) {
