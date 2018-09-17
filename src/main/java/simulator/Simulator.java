@@ -1,65 +1,110 @@
 package main.java.simulator;
 
-import javafx.animation.Transition;
-import javafx.scene.canvas.GraphicsContext;
-import javafx.util.Duration;
+import javafx.animation.AnimationTimer;
 import main.java.engine.Updator;
-import main.java.entities.Car;
-import main.java.map.Map;
 
 public class Simulator {
-
-	private class AnimationController extends Transition {
-
-		Updator updator;
+	
+	public static  double FPS = 30;
+	
+	private class AnimationController extends AnimationTimer {
+		
+		private Updator updator;
+		private long prev = 0;
+		private final long[] frameTimes = new long[25];
+	    private int frameTimeIndex = 0 ;
+	    private boolean arrayFilled = false ;
+		private long elapsedFrameNanos;
+	    private int rate = Simulator.NORMAL_RATE;
+	    
 		public AnimationController(Updator updator) {
-			super(); 
-			this.setCycleDuration(Duration.INDEFINITE);
-			
 			this.updator = updator;
+		
+		
 		}
+		
+		public void setRate(int rate) {
+			this.rate = rate;
+		}
+		
+		
+		public int getRate() {
+			return rate;
+		}
+		
 		
 		
 		@Override
-		protected void interpolate(double arg0) {
-			updator.update();
+		public void handle(long now){
 			
 			
-		}
+			long oldFrameTime = frameTimes[frameTimeIndex] ;
+            frameTimes[frameTimeIndex] = now ;
+            frameTimeIndex = (frameTimeIndex + 1) % frameTimes.length ;
+            if (frameTimeIndex == 0) {
+                arrayFilled = true ;
+            }
+            
+            
+            
+            
+            
+            
+            
+            if (arrayFilled) {
+                long elapsedNanos = now - oldFrameTime ;
+                long elapsedNanosPerFrame = elapsedNanos / frameTimes.length ;
+                
+             
+                if(elapsedNanosPerFrame * rate < elapsedFrameNanos ) {
+                	updator.update();
+                    updator.draw();
+                    prev = now;
+                }
+                elapsedFrameNanos = now - prev;
+                // double frameRate = 1_000_000_000/elapsedNanosPerFrame
+                // double updateRate = 1_000_000_000/elapsedFrameNanos
+            }
 	
+		}
 	}
 	
 	private AnimationController animationController;
-	public static final double MAX_RATE = 4.0;
-	public static final double MIN_RATE = 0.25;
+	
+	/** Here RATE represents the delay factor between updates i.e. higher rate means slow speed **/
+	public static final int MAX_RATE = 16;
+	public static final int MIN_RATE = 1;
+	public static final int NORMAL_RATE = 4;
 	
 	public Simulator(Updator updator) {
-		
 		animationController = new AnimationController(updator);
-		
 	}
 	
 	
-	public void doubleRate() {
-		animationController.setRate(Math.min(MAX_RATE, animationController.getCurrentRate() * 2));
-	}
-	
-	
-	public void halfRate() {
-		animationController.setRate(Math.max(MIN_RATE, animationController.getCurrentRate() / 2));
-	}
 	
 	public void pause() {
-		animationController.pause();
+		animationController.stop();
 	}
 	
 	public void play() {
-		animationController.play();
+		animationController.start();
+		animationController.setRate(NORMAL_RATE);
 	}
 	
 	public void stop() {
 		animationController.stop();
 	}
+	
+	
+	public void doubleSpeed() {
+		animationController.setRate(Math.max(MIN_RATE, Math.round(animationController.getRate()/2)));
+	}
+	
+	public void halfSpeed() {
+		animationController.setRate(Math.min(MAX_RATE, animationController.getRate() * 2));
+	}
+	
+	
 	
 }
 	
