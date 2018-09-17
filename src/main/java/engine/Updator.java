@@ -25,7 +25,8 @@ public class Updator implements ChangeListener<Number>{
 	Recorder recorder;
 	double canvasWidth;
 	double canvasTranslateY = 0;
-	
+	int counter = 0;
+	int timer = 10;
 	private RoadVehicle roads[];
 	
 	class RoadVehicle {
@@ -70,11 +71,97 @@ public class Updator implements ChangeListener<Number>{
 	
 	
 	public void update() {
-		
-	map.draw(canvas.getGraphicsContext2D());
-		
+	if(counter <= 6 && timer % 8 == 0) {
+	generateVehicle();	
+	++counter;
+	}
+	vehicleUpdate();
+		 timer++;
 	}
 	
+	private void vehicleUpdate() {
+		for(RoadVehicle roadVehicle: roads) {			// for all roads
+						
+				for(LinkedList<Vehicle> lane: roadVehicle.backwardLanes) {		// for all backwardLanes
+					
+					ListIterator<Vehicle> iterator = lane.listIterator(lane.size());
+					Vehicle nextVehicle = null;
+					if(iterator.hasPrevious()) {
+						Vehicle vehicle = iterator.next();
+						boolean beDestroyed = vehicle.update(nextVehicle, true);
+						nextVehicle = vehicle;
+						if(beDestroyed) {
+							iterator.remove();
+							vehicleManager.addToPool(vehicle);
+						}
+					}
+					
+					while(iterator.hasPrevious()) {
+						 Vehicle vehicle = iterator.previous();	
+						 boolean beDestroyed = vehicle.update(nextVehicle, false);
+						 nextVehicle = vehicle;
+						 if(beDestroyed) {
+							 iterator.remove();
+							 vehicleManager.addToPool(vehicle);
+						 	}
+						}
+					}
+				
+				
+				for(LinkedList<Vehicle> lane: roadVehicle.forwardLanes){	//for all forwardLanes
+					
+					ListIterator<Vehicle> iterator = lane.listIterator(lane.size());
+					Vehicle nextVehicle = null;
+					
+					if(iterator.hasPrevious()) {
+						Vehicle vehicle = iterator.previous();
+						vehicle.update(nextVehicle, true);
+						nextVehicle = vehicle;
+					}
+					
+					while(iterator.hasPrevious()) {
+						 Vehicle vehicle = iterator.previous();	
+						 vehicle.update(nextVehicle, false);
+						 nextVehicle = vehicle;
+						}
+					}
+				
+				}
+			}
+		
+	
+	
+	public void draw() {
+		canvas.getGraphicsContext2D().clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
+		map.draw(canvas.getGraphicsContext2D());
+		
+		for(int i = 0; i < Map.NUMBER_OF_ROADS; i++) {			// for all roads
+			for(int j = 0; j < map.getNumberOfLanes(); j++) {		// for all lanes
+				
+				LinkedList<Vehicle> lane = roads[i].forwardLanes[j];
+					for(Vehicle vehicle: lane)
+						vehicle.draw(canvas.getGraphicsContext2D());
+				
+				
+				lane = roads[i].backwardLanes[j];
+					for(Vehicle vehicle: lane)
+						vehicle.draw(canvas.getGraphicsContext2D());		
+				}
+			}
+		
+		}
+	
+	private void generateVehicle() {
+		
+		for(int i = 0; i < Map.NUMBER_OF_ROADS; i++) {			// for all roads
+			for(int j = 0; j < map.getNumberOfLanes(); j++) {		// for all lanes
+				
+					roads[i].forwardLanes[j].addFirst(new Car(map.getRoad(i), map.getRoad(i).getForwardLane(j), null, null, map.getCrossing(),map.getWidthProperty(), map.getHeightProperty()));
+				
+			}
+		}
+	}
+
 	public void computeVehicleRegions() {
 		
 	}
