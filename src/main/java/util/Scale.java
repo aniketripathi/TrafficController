@@ -13,13 +13,14 @@ public final class Scale {
 	
 	
 	/** The car width  and length is not taken according to project but real world meanings 
-	 * 
+	 * 	The car length is the width according to Cartesian coordinate system
+	 *  The car width is the height according to Cartesian coordinate system
 	 */
 	public static final double CAR_WIDTH_METERS = 2.0;	
 	public static final double CAR_LENGTH_METERS = 4.4;
 	public static final double LANE_WIDTH_METERS = 3.5;
 	public static final double DIVIDER_WIDTH_METERS = 1;
-	public static final double VEHICLE_SPEED_METERPERSEC = 36;
+	public static final double VEHICLE_SPEED_METERPERSEC = 15;
 	
 	
 	private Scale() {
@@ -35,12 +36,5 @@ public final class Scale {
 		return (meters / pixelToMeterRatio);
 	}
 	
-	public static Image rotateImage(Image image, double angle) {
-	    ImageView iv = new ImageView(image);
-	    SnapshotParameters params = new SnapshotParameters();
-	    params.setFill(Color.TRANSPARENT);
-	    params.setTransform(new Rotate(angle, image.getHeight() / 2, image.getWidth() / 2));
-	    params.setViewport(new Rectangle2D(0, 0, image.getHeight(), image.getWidth()));
-	    return iv.snapshot(params, null);
-	}
+	
 }
