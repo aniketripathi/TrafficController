@@ -35,7 +35,7 @@ public class Map implements ChangeListener<Number> {
 	private Road[] roads;
 	private Crossing crossing;
 
-	private GraphicsContext graphicsContext;
+	
 
 	private boolean areLanesEqual;
 
@@ -136,7 +136,8 @@ public class Map implements ChangeListener<Number> {
 			rf.setLaneLength(rf.getRegion().getHeight());
 			rb.setLaneLength(rb.getRegion().getHeight());
 
-			double carImageWidth = Scale.CAR_WIDTH_METERS / Scale.pixelToMeterRatio;
+			double carImageWidth = Scale.CAR_LENGTH_METERS * Scale.pixelToMeterRatio;
+			
 
 			/** Set Spawn Points **/
 			tf.setCarSpawnPoint(
@@ -150,13 +151,13 @@ public class Map implements ChangeListener<Number> {
 							-HeavyVehicle.getImageWidth() / 2));
 
 			bf.setCarSpawnPoint(
-					new Point2D((width.get() - dividerWidth.get() - laneWidth.get()) / 2 + i * laneWidth.get(),
+					new Point2D((width.get() - dividerWidth.get() - laneWidth.get()) / 2 - i * laneWidth.get(),
 							height.get() + carImageWidth / 2));
 			bf.setTwoWheelerSpawnPoint(
-					new Point2D((width.get() - dividerWidth.get() - laneWidth.get()) / 2 + i * laneWidth.get(),
+					new Point2D((width.get() - dividerWidth.get() - laneWidth.get()) / 2 - i * laneWidth.get(),
 							height.get() + TwoWheeler.getImageWidth() / 2));
 			bf.setHeavyVehicleSpawnPoint(
-					new Point2D((width.get() - dividerWidth.get() - laneWidth.get()) / 2 + i * laneWidth.get(),
+					new Point2D((width.get() - dividerWidth.get() - laneWidth.get()) / 2 - i * laneWidth.get(),
 							height.get() + HeavyVehicle.getImageWidth() / 2));
 
 			lf.setCarSpawnPoint(new Point2D(-carImageWidth / 2,
@@ -322,14 +323,7 @@ public class Map implements ChangeListener<Number> {
 		return trafficLightWidth;
 	}
 
-	public GraphicsContext getGraphicsContext() {
-		return graphicsContext;
-	}
-
-	public void setGraphicsContext(GraphicsContext graphicsContext) {
-		this.graphicsContext = graphicsContext;
-	}
-
+	
 	public boolean isAreLanesEqual() {
 		return areLanesEqual;
 	}
@@ -397,7 +391,6 @@ public class Map implements ChangeListener<Number> {
 	@Override
 	public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
 		computeRegions();
-		gc.clearRect(0, 0, width.get(), height.get());
 
 	}
 
