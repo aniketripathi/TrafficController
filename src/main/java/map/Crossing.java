@@ -3,13 +3,15 @@ package main.java.map;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.ListIterator;
 import java.util.Set;
 
 import javafx.scene.shape.Path;
 import main.java.entities.BackwardLane;
 import main.java.entities.ForwardLane;
+import main.java.entities.Vehicle;
 import main.java.util.Region;
-
 
 public class Crossing {
 
@@ -38,18 +40,19 @@ public class Crossing {
 	private int numberOfLanePairs;
 	private HashMap<LanePair, Path> paths;
 	private Set<LanePair> lanePairs;
+	private LinkedList<Vehicle> queue;
 
 	public static final int DEFAULT_NUMBER_OF_LANE_PAIRS = 16;
 
 	public Crossing() {
-		this(0,0);
+		this(0, 0);
 	}
-	
-	
+
 	public Crossing(double width, double height) {
-		region = new Region(0,0, width, height);
+		region = new Region(0, 0, width, height);
 		paths = new HashMap<LanePair, Path>();
 		lanePairs = new HashSet<LanePair>(numberOfLanePairs);
+		queue = new LinkedList<Vehicle>();
 		numberOfLanePairs = DEFAULT_NUMBER_OF_LANE_PAIRS;
 	}
 
@@ -98,4 +101,27 @@ public class Crossing {
 		this.numberOfLanePairs = numberOfLanePairs;
 	}
 
+	public void addVehicle(Vehicle vehicle) {
+		queue.add(vehicle);
+	}
+
+	public void removeVehicle(Vehicle vehicle) {
+		queue.remove(vehicle);
+	}
+
+	public void clearQueue() {
+		queue.clear();
+	}
+
+	public ListIterator<Vehicle> iterator() {
+		return queue.listIterator();
+	}
+
+	public ListIterator<Vehicle> iterator(int index) {
+		return queue.listIterator(index);
+	}
+
+	public int getVehicleIndex(Vehicle vehicle) {
+		return queue.indexOf(vehicle);
+	}
 }
