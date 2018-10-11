@@ -4,6 +4,7 @@ import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Paint;
+import javafx.scene.shape.Rectangle;
 
 /**
  * 
@@ -32,9 +33,8 @@ public class Region {
 	 */
 	private DoubleProperty height;
 
-
 	public Region(double x, double y, double width, double height) {
-		
+
 		this.x = new SimpleDoubleProperty(x);
 		this.y = new SimpleDoubleProperty(y);
 		this.width = new SimpleDoubleProperty(width);
@@ -42,7 +42,7 @@ public class Region {
 	}
 
 	public Region() {
-		this(0,0,0,0);
+		this(0, 0, 0, 0);
 	}
 
 	// copy constructor
@@ -50,7 +50,6 @@ public class Region {
 		this(region.x.get(), region.y.get(), region.width.get(), region.height.get());
 	}
 
-	
 	public void setAll(double x, double y, double width, double height) {
 		this.x.set(x);
 		this.y.set(y);
@@ -69,7 +68,8 @@ public class Region {
 	 * Sets the center x coordinate of the region
 	 */
 	public void setX(double x) {
-		this.x.set(x);;
+		this.x.set(x);
+		;
 	}
 
 	/**
@@ -97,7 +97,8 @@ public class Region {
 	 * Sets the width of the region
 	 */
 	public void setWidth(double width) {
-		this.width.set(width);;
+		this.width.set(width);
+		;
 	}
 
 	/**
@@ -123,23 +124,24 @@ public class Region {
 	}
 
 	public Region getRegion(double width_percentage, double height_percentage) {
-		return new Region(this.getX(), this.getY(), this.getWidth() * width_percentage / 100, this.getHeight() * height_percentage / 100);
+		return new Region(this.getX(), this.getY(), this.getWidth() * width_percentage / 100,
+				this.getHeight() * height_percentage / 100);
 	}
 
 	public boolean isCoinciding(Region region) {
-		return (Compare.isEqual(this.getX(), region.getX()) && Compare.isEqual(this.getY(), region.getY()));
+		return (MathEngine.isEqual(this.getX(), region.getX()) && MathEngine.isEqual(this.getY(), region.getY()));
 	}
 
 	public boolean isColliding(Region region) {
-		return (Compare.isLarger((this.getWidth() / 2 + region.getWidth() / 2), (this.getX() - region.getX()))
-				&& Compare.isLarger((this.getHeight() / 2 + region.getHeight() / 2), (this.getY() - region.getY())));
+		return (MathEngine.isLarger((this.getWidth() / 2 + region.getWidth() / 2), (this.getX() - region.getX()))
+				&& MathEngine.isLarger((this.getHeight() / 2 + region.getHeight() / 2), (this.getY() - region.getY())));
 	}
 
 	public boolean isInsideOf(Region region) {
-		return (Compare.isSmaller(this.getX() + this.getWidth() / 2, region.getX() + region.getWidth() / 2)
-				&& Compare.isSmaller(this.getY() + this.getHeight() / 2, region.getY() + region.getHeight() / 2)
-				&& Compare.isLarger(this.getX() - this.getWidth() / 2, region.getX() - region.getWidth() / 2)
-				&& Compare.isLarger(this.getY() - this.getHeight() / 2, region.getY() - region.getHeight() / 2));
+		return (MathEngine.isSmaller(this.getX() + this.getWidth() / 2, region.getX() + region.getWidth() / 2)
+				&& MathEngine.isSmaller(this.getY() + this.getHeight() / 2, region.getY() + region.getHeight() / 2)
+				&& MathEngine.isLarger(this.getX() - this.getWidth() / 2, region.getX() - region.getWidth() / 2)
+				&& MathEngine.isLarger(this.getY() - this.getHeight() / 2, region.getY() - region.getHeight() / 2));
 	}
 
 	public boolean isOutsideOf(Region region) {
@@ -147,8 +149,10 @@ public class Region {
 	}
 
 	public boolean isInside(double x, double y) {
-		return (Compare.isSmaller(x, this.getX() + this.getWidth() / 2) && Compare.isLarger(x, this.getX() - this.getWidth() / 2)
-				&& Compare.isSmaller(y, this.getY() + this.getHeight() / 2) && Compare.isLarger(y, this.getY() - this.getHeight() / 2));
+		return (MathEngine.isSmaller(x, this.getX() + this.getWidth() / 2)
+				&& MathEngine.isLarger(x, this.getX() - this.getWidth() / 2)
+				&& MathEngine.isSmaller(y, this.getY() + this.getHeight() / 2)
+				&& MathEngine.isLarger(y, this.getY() - this.getHeight() / 2));
 	}
 
 	public boolean isOutside(int x, int y) {
@@ -174,7 +178,8 @@ public class Region {
 	public void draw(GraphicsContext graphic, Paint fill, Paint strokePaint, double strokeLineWidth, boolean stroke) {
 		graphic.save();
 		graphic.beginPath();
-		graphic.rect(this.getX() - this.getWidth() / 2, this.getY() - this.getHeight() / 2, this.getWidth(), this.getHeight());
+		graphic.rect(this.getX() - this.getWidth() / 2, this.getY() - this.getHeight() / 2, this.getWidth(),
+				this.getHeight());
 		graphic.setFill(fill);
 		graphic.fill();
 		if (stroke) {
@@ -186,24 +191,19 @@ public class Region {
 		graphic.restore();
 
 	}
-	
-	
-	
+
 	public DoubleProperty getXProperty() {
 		return this.x;
 	}
-	
-	
+
 	public DoubleProperty getYProperty() {
 		return this.y;
 	}
-	
-	
+
 	public DoubleProperty getWidthProperty() {
 		return this.width;
 	}
-	
-	
+
 	public DoubleProperty getHeightProperty() {
 		return this.height;
 	}
