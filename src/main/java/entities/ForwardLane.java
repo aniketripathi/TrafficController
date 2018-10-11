@@ -2,8 +2,6 @@ package main.java.entities;
 
 import javafx.geometry.Point2D;
 import javafx.scene.shape.Line;
-import javafx.scene.shape.Path;
-import main.java.util.Region;
 
 public class ForwardLane extends Lane {
 
@@ -11,22 +9,19 @@ public class ForwardLane extends Lane {
 	 * The line coordinates where this lane ends
 	 */
 	private Line exitBarrier;
-	
+
 	private Point2D carSpawnPoint;
 	private Point2D twoWheelerSpawnPoint;
 	private Point2D heavyVehicleSpawnPoint;
 
-	public ForwardLane(Road road) {
-		super(road);
+	public ForwardLane(Road road, int index) {
+		super(road, index);
 		exitBarrier = new Line();
-		carSpawnPoint = new Point2D(0,0);
-		twoWheelerSpawnPoint = new Point2D(0,0);
-		heavyVehicleSpawnPoint = new Point2D(0,0);
-		
+		carSpawnPoint = new Point2D(0, 0);
+		twoWheelerSpawnPoint = new Point2D(0, 0);
+		heavyVehicleSpawnPoint = new Point2D(0, 0);
+
 	}
-
-
-	
 
 	public Line getExitBarrier() {
 		return exitBarrier;
@@ -59,7 +54,5 @@ public class ForwardLane extends Lane {
 	public void setHeavyVehicleSpawnPoint(Point2D heavyVehicleSpawnPoint) {
 		this.heavyVehicleSpawnPoint = heavyVehicleSpawnPoint;
 	}
-	
-	
 
 }

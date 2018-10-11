@@ -1,9 +1,5 @@
 package main.java.entities;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.ListIterator;
-
 import javafx.scene.canvas.GraphicsContext;
 import main.java.util.LinearPath;
 import main.java.util.Path;
@@ -14,57 +10,54 @@ public abstract class Lane {
 	private Region region;
 
 	// 1- close to divider, 2 - away from divider
-	
+
 	private Road road;
 	private double laneLength;
 	private double remainingLength;
 	private Path carPath;
 	private Path twoWheelerPath;
 	private Path heavyVehiclePath;
+	private int index;
 
 	// private static final int queueSize = 100;
 
-	public Lane(Road road) {
-		
+	public Lane(Road road, int index) {
+
 		this.road = road;
 		region = new Region();
-		carPath = new LinearPath();
-		twoWheelerPath = new LinearPath();
-		heavyVehiclePath = new LinearPath();
+		this.index = index;
 		this.laneLength = 0;
 		this.remainingLength = 0;
-		
+
 	}
 
+	public int getIndex() {
+		return this.index;
+	}
 
-	
-
-	
-	
-	
-	
 	public Road getRoad() {
 		return road;
 	}
 
-
-
-
-
-
-
-
 	public void setRoad(Road road) {
 		this.road = road;
 	}
-	
 
+	public double getX() {
+		return region.getX();
+	}
 
+	public double getY() {
+		return region.getY();
+	}
 
+	public double getWidth() {
+		return region.getWidth();
+	}
 
-
-
-
+	public double getHeight() {
+		return region.getHeight();
+	}
 
 	/**
 	 * 
@@ -74,8 +67,6 @@ public abstract class Lane {
 
 	}
 
-
-
 	public Region getRegion() {
 		return region;
 	}
@@ -84,7 +75,6 @@ public abstract class Lane {
 		this.region = region;
 	}
 
-	
 	public double getLaneLength() {
 		return laneLength;
 	}
@@ -96,7 +86,7 @@ public abstract class Lane {
 	public double getRemainingLength() {
 		return remainingLength;
 	}
-	
+
 	/** Always lies between 0 and laneLength **/
 
 	public void setRemainingLength(double remainingLength) {
@@ -112,7 +102,6 @@ public abstract class Lane {
 		this.carPath = carPath;
 	}
 
-	
 	public Path getTwoWheelerPath() {
 		return twoWheelerPath;
 	}
@@ -123,15 +112,11 @@ public abstract class Lane {
 
 	public Path getHeavyVehiclePath() {
 		return heavyVehiclePath;
-		
+
 	}
 
 	public void setHeavyVehiclePath(Path heavyVehiclePath) {
 		this.heavyVehiclePath = heavyVehiclePath;
 	}
 
-	
-	
-	
-	
 }

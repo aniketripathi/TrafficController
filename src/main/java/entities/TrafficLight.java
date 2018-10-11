@@ -23,7 +23,7 @@ public class TrafficLight {
 	private LightColor color;
 	private double timer;
 	private Region region;
-	public static final LightColor DEFAULT_COLOR = LightColor.RED;
+	public static final LightColor DEFAULT_COLOR = LightColor.GREEN;
 
 	public TrafficLight(boolean enabled) {
 		this.enabled = enabled;
@@ -78,12 +78,30 @@ public class TrafficLight {
 	public void setRegion(Region region) {
 		this.region = region;
 	}
-	
+
 	public boolean isRed() {
 		return this.color == LightColor.RED;
 	}
-	
+
 	public boolean isGreen() {
+
 		return this.color == LightColor.GREEN;
 	}
+
+	public double getX() {
+		return region.getX();
+	}
+
+	public double getY() {
+		return region.getY();
+	}
+
+	public double getHeight() {
+		return region.getHeight();
+	}
+
+	public double getWidth() {
+		return region.getWidth();
+	}
+
 }

@@ -6,18 +6,17 @@ import javafx.scene.image.Image;
 import main.java.map.Crossing;
 
 public class TwoWheeler extends Vehicle {
-	
+
 	private static double imageWidth = 40;
 	private static double imageHeight = 40;
-	
+
 	private Image image;
 
-	public TwoWheeler(Road currentRoad, ForwardLane sourceLane, Road destinationRoad, BackwardLane destinationLane, Crossing crossing, DoubleProperty mapWidth, DoubleProperty mapHeight) {
+	public TwoWheeler(Road currentRoad, ForwardLane sourceLane, Road destinationRoad, BackwardLane destinationLane,
+			Crossing crossing, DoubleProperty mapWidth, DoubleProperty mapHeight) {
 		super(currentRoad, sourceLane, destinationRoad, destinationLane, crossing, mapWidth, mapHeight);
 		// TODO Auto-generated constructor stub
 	}
-
-	
 
 	public static double getImageWidth() {
 		return imageWidth;
@@ -43,22 +42,16 @@ public class TwoWheeler extends Vehicle {
 		this.image = image;
 	}
 
-
-
 	@Override
 	public void draw(GraphicsContext gc) {
 		// TODO Auto-generated method stub
-		
+
 	}
-
-
 
 	@Override
 	public void computeRegions() {
 		// TODO Auto-generated method stub
-		
+
 	}
-	
-	
-	
+
 }
