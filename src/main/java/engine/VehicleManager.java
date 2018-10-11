@@ -7,30 +7,25 @@ import main.java.entities.BackwardLane;
 import main.java.entities.Car;
 import main.java.entities.ForwardLane;
 import main.java.entities.HeavyVehicle;
-import main.java.entities.Lane;
 import main.java.entities.Road;
 import main.java.entities.TwoWheeler;
 import main.java.entities.Vehicle;
 import main.java.map.Crossing;
-import main.java.util.Compare;
 
 public class VehicleManager {
 
 	private LinkedList<Car> carPool;
 	private LinkedList<TwoWheeler> twoWheelerPool;
 	private LinkedList<HeavyVehicle> heavyVehiclePool;
-	
+
 	public VehicleManager() {
 
 		carPool = new LinkedList<Car>();
 		twoWheelerPool = new LinkedList<TwoWheeler>();
 		heavyVehiclePool = new LinkedList<HeavyVehicle>();
 
-
 	}
-	
-	
-	
+
 	public boolean isCarPoolEmpty() {
 		return carPool.isEmpty();
 	}
@@ -43,8 +38,8 @@ public class VehicleManager {
 		return heavyVehiclePool.isEmpty();
 	}
 
-	public Car getCar(Road currentRoad, ForwardLane sourceLane, Road destinationRoad,
-			BackwardLane destinationLane, Crossing crossing, DoubleProperty mapWidth, DoubleProperty mapHeight) {
+	public Car getCar(Road currentRoad, ForwardLane sourceLane, Road destinationRoad, BackwardLane destinationLane,
+			Crossing crossing, DoubleProperty mapWidth, DoubleProperty mapHeight) {
 		Car car;
 
 		if (isCarPoolEmpty())
@@ -67,7 +62,8 @@ public class VehicleManager {
 		TwoWheeler twoWheeler;
 
 		if (isCarPoolEmpty())
-			twoWheeler = new TwoWheeler(currentRoad, sourceLane, destinationRoad, destinationLane, crossing, mapWidth, mapHeight);
+			twoWheeler = new TwoWheeler(currentRoad, sourceLane, destinationRoad, destinationLane, crossing, mapWidth,
+					mapHeight);
 
 		else {
 			twoWheeler = twoWheelerPool.pollFirst();
@@ -86,7 +82,8 @@ public class VehicleManager {
 		HeavyVehicle heavyVehicle;
 
 		if (isCarPoolEmpty())
-			heavyVehicle = new HeavyVehicle(currentRoad, sourceLane, destinationRoad, destinationLane, crossing, mapWidth, mapHeight);
+			heavyVehicle = new HeavyVehicle(currentRoad, sourceLane, destinationRoad, destinationLane, crossing,
+					mapWidth, mapHeight);
 
 		else {
 			heavyVehicle = heavyVehiclePool.pollFirst();

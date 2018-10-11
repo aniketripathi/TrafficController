@@ -3,13 +3,14 @@ package main.java.application;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-import main.java.util.Scale;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.canvas.Canvas;
+import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
+import javafx.scene.control.Label;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.ToolBar;
 import javafx.scene.layout.AnchorPane;
@@ -17,13 +18,16 @@ import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.transform.Rotate;
 import main.java.data.Config;
 import main.java.data.Recorder;
-import main.java.engine.Updator;
+import main.java.engine.Updater;
 import main.java.engine.VehicleManager;
-import main.java.entities.Car;
+import main.java.entities.TrafficLight.LightColor;
 import main.java.map.Map;
 import main.java.simulator.Simulator;
+import main.java.util.Scale;
 
 public class Controller implements Initializable, ChangeListener<Number> {
 
@@ -57,6 +61,18 @@ public class Controller implements Initializable, ChangeListener<Number> {
 	private HBox generatedHbox;
 	@FXML
 	private HBox crossedHbox;
+	@FXML
+	private Button halfSpeedButton;
+	@FXML
+	private Button doubleSpeedButton;
+	@FXML
+	private Button playButton;
+	@FXML
+	private Button pauseButton;
+	@FXML
+	private Button stopButton;
+	@FXML
+	private Label timerValueLabel;
 
 	private Map map;
 
@@ -70,19 +86,27 @@ public class Controller implements Initializable, ChangeListener<Number> {
 
 		double laneWidth = Scale.LANE_WIDTH_METERS * Scale.pixelToMeterRatio;
 		double dividerWidth = Scale.DIVIDER_WIDTH_METERS * Scale.pixelToMeterRatio;
-		double crossingWidth = (laneWidth * 6 + dividerWidth) * 1.3;
+		double crossingWidth = (laneWidth * 6 + dividerWidth) * 1.7;
 		double trafficLightWidth = dividerWidth;
-		map = new Map(canvas.getWidth(), canvas.getHeight(), laneWidth, dividerWidth,  trafficLightWidth, crossingWidth, crossingWidth);
+		map = new Map(canvas.getWidth(), canvas.getHeight(), laneWidth, dividerWidth, trafficLightWidth, crossingWidth,
+				crossingWidth);
 		map.setGC(canvas.getGraphicsContext2D());
-		
+
+		// canvas.getGraphicsContext2D().rotate(10);
 		VehicleManager vehicleManager = new VehicleManager();
 		Config config = new Config(map.getNumberOfLanes());
 		Recorder recorder = new Recorder(map.getNumberOfLanes());
-		Updator updator = new Updator(map, canvas, vehicleManager, config, recorder);
-		Simulator sim = new Simulator(updator);
-		sim.play();
-		
-		
+		Updater updater = new Updater(map, canvas, vehicleManager, config, recorder, timerValueLabel);
+		Simulator sim = new Simulator(updater);
+
+		playButton.setOnAction(evt -> sim.play());
+		pauseButton.setOnAction(evt -> sim.pause());
+		stopButton.setOnAction(evt -> sim.stop());
+		halfSpeedButton.setOnAction(evt -> sim.halfSpeed());
+		doubleSpeedButton.setOnAction(evt -> sim.doubleSpeed());
+		map.getRoad(2).getTrafficLight().setColor(LightColor.GREEN);
+		map.getRoad(3).getTrafficLight().setColor(LightColor.GREEN);
+
 	}
 
 	@Override
