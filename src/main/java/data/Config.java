@@ -9,7 +9,7 @@ import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import main.java.util.Compare;
+import main.java.util.MathEngine;
 
 public class Config {
 
@@ -20,7 +20,6 @@ public class Config {
 		private DoubleProperty heavyVehicleProbability;
 		private DoubleProperty rate;
 
-		
 		public static final double DEFAULT_CAR_PROBABILITY = 0.5;
 		public static final double DEFAULT_TWO_WHEELER_PROBABILITY = 0.2;
 		public static final double DEFAULT_HEAVY_VEHICLE_PROBABILITY = 0.3;
@@ -36,7 +35,7 @@ public class Config {
 
 		public void validate() throws ProbabilityException {
 			if (Math.abs(carProbability.get() + twoWheelerProbability.get() + heavyVehicleProbability.get()
-					- 1) > Compare.THRESHOLD) {
+					- 1) > MathEngine.THRESHOLD) {
 				throw new ProbabilityException(ProbabilityException.CODE.BEYOND_RANGE);
 			}
 		}

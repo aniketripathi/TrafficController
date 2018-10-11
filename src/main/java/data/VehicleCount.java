@@ -5,7 +5,7 @@ import javafx.beans.property.SimpleLongProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 
-public class VehicleCount implements ChangeListener<Number>{
+public class VehicleCount implements ChangeListener<Number> {
 	private final LongProperty car;
 	private final LongProperty twoWheeler;
 	private final LongProperty heavyVehicle;
@@ -26,8 +26,8 @@ public class VehicleCount implements ChangeListener<Number>{
 		total.set(0);
 	}
 
-	//public LongProperty getCarProperty() {
-	//	return car;
+	// public LongProperty getCarProperty() {
+	// return car;
 //	}
 
 	public LongProperty getTwoWheelerProperty() {
@@ -53,7 +53,7 @@ public class VehicleCount implements ChangeListener<Number>{
 
 	public void incrementTwoWheelerCount() {
 		twoWheeler.set(twoWheeler.get() + 1);
-		
+
 	}
 
 	public void decrementTwoWheelerCount() {
@@ -71,6 +71,6 @@ public class VehicleCount implements ChangeListener<Number>{
 	@Override
 	public void changed(ObservableValue<? extends Number> arg0, Number arg1, Number arg2) {
 		total.set(car.get() + twoWheeler.get() + heavyVehicle.get());
-		
+
 	}
 }
