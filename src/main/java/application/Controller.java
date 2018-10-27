@@ -105,7 +105,7 @@ public class Controller implements Initializable, ChangeListener<Number> {
 		halfSpeedButton.setOnAction(evt -> sim.halfSpeed());
 		doubleSpeedButton.setOnAction(evt -> sim.doubleSpeed());
 		map.getRoad(2).getTrafficLight().setColor(LightColor.GREEN);
-		map.getRoad(3).getTrafficLight().setColor(LightColor.GREEN);
+		// map.getRoad(1).getTrafficLight().setColor(LightColor.GREEN);
 
 	}
 
