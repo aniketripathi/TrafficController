@@ -16,6 +16,10 @@ public abstract class Vehicle {
 		TOP_TO_BOTTOM, BOTTOM_TO_TOP, LEFT_TO_RIGHT, RIGHT_TO_LEFT;
 	}
 
+	public enum Type {
+		CAR, TWO_WHEELER, HEAVY_VEHICLE;
+	}
+
 	private double velocityX;
 	private double velocityY;
 	private double accelerationX;
@@ -75,6 +79,7 @@ public abstract class Vehicle {
 	private static double vehiclePadding = 5;
 	private static double trafficLightPadding = 6;
 	protected static double maxSpeed = 20;
+	protected static double crossingMaxSpeed = 5;
 
 	public Vehicle(Road sourceRoad, ForwardLane sourceLane, Road destinationRoad, BackwardLane destinationLane,
 			Crossing crossing, DoubleProperty mapWidth, DoubleProperty mapHeight) {
@@ -109,7 +114,13 @@ public abstract class Vehicle {
 		updateDirection();
 	}
 
+	public abstract Type getType();
+
 	public abstract void computeRegions();
+
+	public static double getVehiclePadding() {
+		return Vehicle.vehiclePadding;
+	}
 
 	public void reset() {
 
@@ -472,19 +483,13 @@ public abstract class Vehicle {
 		}
 	}
 
-	private boolean backwardLaneVehicleUpdate(Vehicle nextVehicle, boolean isLastVehicle) {
+	private void backwardLaneVehicleUpdate(Vehicle nextVehicle, boolean isLastVehicle) {
 
 		switch (this.direction) {
 
 		case TOP_TO_BOTTOM:
 			this.setVelocityX(0);
 			if (isLastVehicle) {
-
-				if (MathEngine.isLarger(this.getY() - this.getHeight() / 2,
-						this.currentLane.getY() + this.currentLane.getHeight() / 2)) {
-					return true;
-				}
-
 				this.setVelocityY(Vehicle.maxSpeed);
 			} else {
 				double nextVehicleSpeed = nextVehicle.getVelocityY();
@@ -516,11 +521,6 @@ public abstract class Vehicle {
 		case BOTTOM_TO_TOP:
 			this.setVelocityX(0);
 			if (isLastVehicle) {
-
-				if (MathEngine.isLarger(this.getY() + this.getHeight() / 2,
-						this.currentLane.getY() - this.currentLane.getHeight() / 2)) {
-					return true;
-				}
 				this.setVelocityY(-Vehicle.maxSpeed);
 			} else {
 				double nextVehicleSpeed = nextVehicle.getVelocityY();
@@ -553,11 +553,6 @@ public abstract class Vehicle {
 		case LEFT_TO_RIGHT:
 			this.setVelocityY(0);
 			if (isLastVehicle) {
-				if (MathEngine.isLarger(this.getX() - this.getWidth() / 2,
-						this.currentLane.getX() + this.currentLane.getWidth() / 2)) {
-					return true;
-				}
-
 				this.setVelocityX(Vehicle.maxSpeed);
 			} else {
 				double nextVehicleSpeed = nextVehicle.getVelocityX();
@@ -589,11 +584,6 @@ public abstract class Vehicle {
 		case RIGHT_TO_LEFT:
 			this.setVelocityY(0);
 			if (isLastVehicle) {
-				if (MathEngine.isLarger(this.getX() + this.getWidth() / 2,
-						this.currentLane.getX() - this.currentLane.getWidth() / 2)) {
-					return true;
-				}
-
 				this.setVelocityX(-Vehicle.maxSpeed);
 			} else {
 				double nextVehicleSpeed = nextVehicle.getVelocityX();
@@ -626,17 +616,33 @@ public abstract class Vehicle {
 			this.setVelocityX(0);
 			this.setVelocityY(0);
 		}
-		return false;
 	}
 
 	/**
-	 * Updation
+	 * Update the vehicle position, velocity and other variables Returns whether the
+	 * vehicle left the backwardLane, crossing or the forwardLane region depending
+	 * upon what was its current region.
 	 * 
-	 * @return
+	 * @returns true if the vehicle left the region of the map which contained it,
+	 *          otherwise false
 	 */
 	public boolean update(Vehicle nextVehicle, boolean isLastVehicle) {
 
-		boolean beDestroyed = false;
+		boolean leftRegion = false;
+		/** updating velocity **/
+
+		if (inCrossing) {
+
+			crossingVehicleUpdate(nextVehicle);
+			this.collisionUpdate();
+		}
+
+		else if (this.currentLane.getClass() == ForwardLane.class) {
+			forwardLaneVehicleUpdate(nextVehicle, isLastVehicle);
+		} else if (this.currentLane.getClass() == BackwardLane.class) {
+
+			backwardLaneVehicleUpdate(nextVehicle, isLastVehicle);
+		}
 
 		/** update position **/
 
@@ -654,25 +660,9 @@ public abstract class Vehicle {
 
 		/** update consequences **/
 
-		updateVariables();
+		leftRegion = updateVariables(isLastVehicle);
 
-		/** updating velocity **/
-
-		if (inCrossing) {
-
-			crossingVehicleUpdate(nextVehicle, isLastVehicle);
-			this.collisionUpdate();
-		}
-
-		else if (this.currentLane.getClass() == ForwardLane.class) {
-			forwardLaneVehicleUpdate(nextVehicle, isLastVehicle);
-		} else if (this.currentLane.getClass() == BackwardLane.class) {
-
-			beDestroyed = backwardLaneVehicleUpdate(nextVehicle, isLastVehicle);
-
-		}
-
-		return beDestroyed;
+		return leftRegion;
 	}
 
 	protected double getCurrentCrossingTurnAngle() {
@@ -769,7 +759,8 @@ public abstract class Vehicle {
 
 	}
 
-	private void updateVariables() {
+	private boolean updateVariables(boolean isLastVehicle) {
+		boolean leftRegion = false;
 		if (inCrossing) {
 
 			double angle = Vehicle.getAngle(this.sourceRoad.getType().getIndex(),
@@ -791,6 +782,7 @@ public abstract class Vehicle {
 
 					if (MathEngine.isSmallerEquals(xGap, 0)) {
 						this.setToDestination();
+						leftRegion = true;
 						double tempWidth = this.getWidth();
 						this.getRegion().setWidth(this.getHeight());
 						this.getRegion().setHeight(tempWidth);
@@ -802,6 +794,7 @@ public abstract class Vehicle {
 					double yGap = (this.getDestinationLane().getY() - this.getDestinationLane().getHeight() / 2
 							+ this.getHeight() / 2) - this.getY();
 					if (MathEngine.isSmallerEquals(yGap, 0)) {
+						leftRegion = true;
 						this.setToDestination();
 					}
 				}
@@ -822,6 +815,7 @@ public abstract class Vehicle {
 
 					if (MathEngine.isSmallerEquals(xGap, 0)) {
 						this.setToDestination();
+						leftRegion = true;
 						double tempWidth = this.getWidth();
 						this.getRegion().setWidth(this.getHeight());
 						this.getRegion().setHeight(tempWidth);
@@ -834,6 +828,7 @@ public abstract class Vehicle {
 							+ this.getDestinationLane().getHeight() / 2 - this.getHeight() / 2);
 					if (MathEngine.isSmallerEquals(yGap, 0)) {
 						this.setToDestination();
+						leftRegion = true;
 					}
 				}
 
@@ -853,6 +848,7 @@ public abstract class Vehicle {
 
 					if (MathEngine.isSmallerEquals(yGap, 0)) {
 						this.setToDestination();
+						leftRegion = true;
 						double tempWidth = this.getWidth();
 						this.getRegion().setWidth(this.getHeight());
 						this.getRegion().setHeight(tempWidth);
@@ -865,6 +861,7 @@ public abstract class Vehicle {
 							+ this.getWidth() / 2) - this.getX();
 					if (MathEngine.isSmallerEquals(xGap, 0)) {
 						this.setToDestination();
+						leftRegion = true;
 					}
 				}
 
@@ -884,6 +881,7 @@ public abstract class Vehicle {
 
 					if (MathEngine.isSmallerEquals(yGap, 0)) {
 						this.setToDestination();
+						leftRegion = true;
 						double tempWidth = this.getWidth();
 						this.getRegion().setWidth(this.getHeight());
 						this.getRegion().setHeight(tempWidth);
@@ -896,6 +894,7 @@ public abstract class Vehicle {
 							+ this.getDestinationLane().getWidth() / 2 - this.getWidth() / 2);
 					if (MathEngine.isSmallerEquals(xGap, 0)) {
 						this.setToDestination();
+						leftRegion = true;
 					}
 				}
 
@@ -904,17 +903,15 @@ public abstract class Vehicle {
 			}
 		}
 
-		else if (this.currentRoad.equals(this.sourceRoad)) {
+		else if (this.currentRoad.equals(this.sourceRoad) && isLastVehicle) {
 
 			switch (this.direction) {
 
 			case TOP_TO_BOTTOM: {
 				if (MathEngine.isLargerEquals(this.getY(),
 						this.sourceLane.getY() + this.sourceLane.getHeight() / 2 - this.getHeight() / 2)) {
-					this.crossing.addVehicle(this);
-					this.inCrossing = true;
-					this.currentLane = null;
-					this.currentRoad = null;
+					this.intoCrossingVariablesUpdate();
+					leftRegion = true;
 				}
 				break;
 			}
@@ -922,10 +919,8 @@ public abstract class Vehicle {
 			case BOTTOM_TO_TOP: {
 				if (MathEngine.isSmallerEquals(this.getY(),
 						this.sourceLane.getY() - this.sourceLane.getHeight() / 2 + this.getHeight() / 2)) {
-					this.crossing.addVehicle(this);
-					this.inCrossing = true;
-					this.currentLane = null;
-					this.currentRoad = null;
+					this.intoCrossingVariablesUpdate();
+					leftRegion = true;
 				}
 				break;
 			}
@@ -933,10 +928,8 @@ public abstract class Vehicle {
 			case LEFT_TO_RIGHT: {
 				if (MathEngine.isLargerEquals(this.getX(),
 						this.sourceLane.getX() + this.sourceLane.getWidth() / 2 - this.getWidth() / 2)) {
-					this.crossing.addVehicle(this);
-					this.inCrossing = true;
-					this.currentLane = null;
-					this.currentRoad = null;
+					this.intoCrossingVariablesUpdate();
+					leftRegion = true;
 				}
 				break;
 			}
@@ -944,10 +937,8 @@ public abstract class Vehicle {
 			case RIGHT_TO_LEFT: {
 				if (MathEngine.isSmallerEquals(this.getX(),
 						this.sourceLane.getX() - this.sourceLane.getWidth() / 2 + this.getWidth() / 2)) {
-					this.crossing.addVehicle(this);
-					this.inCrossing = true;
-					this.currentLane = null;
-					this.currentRoad = null;
+					this.intoCrossingVariablesUpdate();
+					leftRegion = true;
 				}
 				break;
 			}
@@ -955,9 +946,54 @@ public abstract class Vehicle {
 			}
 
 		}
+
+		else if (this.currentRoad.equals(this.destinationRoad) && isLastVehicle) {
+			switch (this.direction) {
+
+			case TOP_TO_BOTTOM: {
+				if (MathEngine.isLargerEquals(this.getY() - this.getHeight() / 2,
+						this.currentLane.getY() + this.currentLane.getHeight() / 2)) {
+					leftRegion = true;
+				}
+				break;
+			}
+
+			case BOTTOM_TO_TOP: {
+				if (MathEngine.isSmallerEquals(this.getY() + this.getHeight() / 2,
+						this.currentLane.getY() - this.currentLane.getHeight() / 2)) {
+					leftRegion = true;
+				}
+				break;
+			}
+
+			case LEFT_TO_RIGHT: {
+				if (MathEngine.isLargerEquals(this.getX() - this.getWidth() / 2,
+						this.currentLane.getX() + this.currentLane.getWidth() / 2)) {
+					leftRegion = true;
+				}
+				break;
+			}
+
+			case RIGHT_TO_LEFT: {
+				if (MathEngine.isSmallerEquals(this.getX() + this.getWidth() / 2,
+						this.currentLane.getX() - this.currentLane.getWidth() / 2)) {
+					leftRegion = true;
+				}
+			}
+
+			}
+		}
+
+		return leftRegion;
 	}
 
-	private void crossingVehicleUpdate(Vehicle nextVehicle, boolean isLastVehicle) {
+	private void intoCrossingVariablesUpdate() {
+		this.inCrossing = true;
+		this.currentLane = null;
+		this.currentRoad = null;
+	}
+
+	private void crossingVehicleUpdate(Vehicle nextVehicle) {
 
 		double angle = Vehicle.getAngle(this.sourceRoad.getType().getIndex(),
 				this.destinationRoad.getType().getIndex());
@@ -987,9 +1023,9 @@ public abstract class Vehicle {
 						* MathEngine.getDistance(maxXGap - xGap, maxYGap - yGap)
 						/ MathEngine.getDistance(maxXGap, maxYGap));
 
-				double xSpeed = Vehicle.maxSpeed * maxXGap / (MathEngine.getDistance(maxXGap, maxYGap))
+				double xSpeed = Vehicle.crossingMaxSpeed * maxXGap / (MathEngine.getDistance(maxXGap, maxYGap))
 						* Math.sin(tempAngle);
-				double ySpeed = Vehicle.maxSpeed * maxYGap / (MathEngine.getDistance(maxXGap, maxYGap))
+				double ySpeed = Vehicle.crossingMaxSpeed * maxYGap / (MathEngine.getDistance(maxXGap, maxYGap))
 						* Math.cos(tempAngle);
 
 				if (MathEngine.isLarger(yGap, ySpeed))
@@ -1008,8 +1044,8 @@ public abstract class Vehicle {
 			else {
 				double straightAngle = this.getCurrentCrossingTurnAngle();
 				this.setAngle(-straightAngle);
-				this.setVelocityX(Vehicle.maxSpeed * Math.sin(straightAngle));
-				this.setVelocityY(Vehicle.maxSpeed * Math.cos(straightAngle));
+				this.setVelocityX(Vehicle.crossingMaxSpeed * Math.sin(straightAngle));
+				this.setVelocityY(Vehicle.crossingMaxSpeed * Math.cos(straightAngle));
 			}
 			break;
 		}
@@ -1036,9 +1072,9 @@ public abstract class Vehicle {
 						* MathEngine.getDistance(maxXGap - xGap, maxYGap - yGap)
 						/ MathEngine.getDistance(maxXGap, maxYGap));
 
-				double xSpeed = Vehicle.maxSpeed * maxXGap / (MathEngine.getDistance(maxXGap, maxYGap))
+				double xSpeed = Vehicle.crossingMaxSpeed * maxXGap / (MathEngine.getDistance(maxXGap, maxYGap))
 						* Math.sin(tempAngle);
-				double ySpeed = Vehicle.maxSpeed * maxYGap / (MathEngine.getDistance(maxXGap, maxYGap))
+				double ySpeed = Vehicle.crossingMaxSpeed * maxYGap / (MathEngine.getDistance(maxXGap, maxYGap))
 						* Math.cos(tempAngle);
 
 				if (MathEngine.isLarger(yGap, ySpeed))
@@ -1053,8 +1089,8 @@ public abstract class Vehicle {
 			else {
 				double straightAngle = this.getCurrentCrossingTurnAngle();
 				this.setAngle(straightAngle);
-				this.setVelocityX(Vehicle.maxSpeed * Math.sin(straightAngle));
-				this.setVelocityY(-Vehicle.maxSpeed * Math.cos(straightAngle));
+				this.setVelocityX(Vehicle.crossingMaxSpeed * Math.sin(straightAngle));
+				this.setVelocityY(-Vehicle.crossingMaxSpeed * Math.cos(straightAngle));
 			}
 			break;
 		}
@@ -1080,9 +1116,9 @@ public abstract class Vehicle {
 						* MathEngine.getDistance(maxXGap - xGap, maxYGap - yGap)
 						/ MathEngine.getDistance(maxXGap, maxYGap));
 
-				double xSpeed = Vehicle.maxSpeed * maxXGap / (MathEngine.getDistance(maxYGap, maxXGap))
+				double xSpeed = Vehicle.crossingMaxSpeed * maxXGap / (MathEngine.getDistance(maxYGap, maxXGap))
 						* Math.cos(tempAngle);
-				double ySpeed = Vehicle.maxSpeed * maxYGap / (MathEngine.getDistance(maxYGap, maxXGap))
+				double ySpeed = Vehicle.crossingMaxSpeed * maxYGap / (MathEngine.getDistance(maxYGap, maxXGap))
 						* Math.sin(tempAngle);
 
 				if (MathEngine.isLarger(xGap, xSpeed))
@@ -1100,8 +1136,8 @@ public abstract class Vehicle {
 			else {
 				double straightAngle = this.getCurrentCrossingTurnAngle();
 				this.setAngle(straightAngle);
-				this.setVelocityX(Vehicle.maxSpeed * Math.cos(straightAngle));
-				this.setVelocityY(Vehicle.maxSpeed * Math.sin(straightAngle));
+				this.setVelocityX(Vehicle.crossingMaxSpeed * Math.cos(straightAngle));
+				this.setVelocityY(Vehicle.crossingMaxSpeed * Math.sin(straightAngle));
 			}
 			break;
 		}
@@ -1128,9 +1164,9 @@ public abstract class Vehicle {
 						* MathEngine.getDistance(maxXGap - xGap, maxYGap - yGap)
 						/ MathEngine.getDistance(maxXGap, maxYGap));
 
-				double xSpeed = Vehicle.maxSpeed * maxXGap / (MathEngine.getDistance(maxYGap, maxXGap))
+				double xSpeed = Vehicle.crossingMaxSpeed * maxXGap / (MathEngine.getDistance(maxYGap, maxXGap))
 						* Math.cos(tempAngle);
-				double ySpeed = Vehicle.maxSpeed * maxYGap / (MathEngine.getDistance(maxYGap, maxXGap))
+				double ySpeed = Vehicle.crossingMaxSpeed * maxYGap / (MathEngine.getDistance(maxYGap, maxXGap))
 						* Math.sin(tempAngle);
 
 				if (MathEngine.isLarger(xGap, xSpeed))
@@ -1148,8 +1184,8 @@ public abstract class Vehicle {
 			else {
 				double straightAngle = this.getCurrentCrossingTurnAngle();
 				this.setAngle(-straightAngle);
-				this.setVelocityX(-Vehicle.maxSpeed * Math.cos(straightAngle));
-				this.setVelocityY(Vehicle.maxSpeed * Math.sin(straightAngle));
+				this.setVelocityX(-Vehicle.crossingMaxSpeed * Math.cos(straightAngle));
+				this.setVelocityY(Vehicle.crossingMaxSpeed * Math.sin(straightAngle));
 			}
 			break;
 		}
@@ -1160,7 +1196,6 @@ public abstract class Vehicle {
 
 	private void setToDestination() {
 		this.inCrossing = false;
-		this.crossing.removeVehicle(this);
 		this.currentLane = this.destinationLane;
 		this.currentRoad = this.destinationRoad;
 	}
@@ -1212,7 +1247,7 @@ public abstract class Vehicle {
 
 	private void collisionUpdate() {
 		int index = this.getCrossing().getVehicleIndex(this);
-		ListIterator<Vehicle> iterator = this.getCrossing().iterator(index);
+		ListIterator<Vehicle> iterator = this.getCrossing().listIterator(index);
 		while (iterator.hasPrevious()) {
 			Vehicle vehicle = iterator.previous();
 			if (this.collisionDetect(vehicle)) {
