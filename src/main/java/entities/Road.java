@@ -66,6 +66,10 @@ public class Road {
 		return this.type;
 	}
 
+	public int getIndex() {
+		return this.type.getIndex();
+	}
+
 	private void createAllLanes() {
 
 		for (int i = 0; i < numberOfLanes; i++) {
