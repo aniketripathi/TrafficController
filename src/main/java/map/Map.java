@@ -139,10 +139,10 @@ public class Map implements ChangeListener<Number> {
 			tb.setLaneLength(tb.getRegion().getHeight());
 			bf.setLaneLength(bf.getRegion().getHeight());
 			bb.setLaneLength(bb.getRegion().getHeight());
-			lf.setLaneLength(lf.getRegion().getHeight());
-			lb.setLaneLength(lb.getRegion().getHeight());
-			rf.setLaneLength(rf.getRegion().getHeight());
-			rb.setLaneLength(rb.getRegion().getHeight());
+			lf.setLaneLength(lf.getRegion().getWidth());
+			lb.setLaneLength(lb.getRegion().getWidth());
+			rf.setLaneLength(rf.getRegion().getWidth());
+			rb.setLaneLength(rb.getRegion().getWidth());
 
 			double carImageWidth = Scale.CAR_LENGTH_METERS * Scale.pixelToMeterRatio;
 
@@ -181,33 +181,6 @@ public class Map implements ChangeListener<Number> {
 			rf.setHeavyVehicleSpawnPoint(new Point2D(width.get() + carImageWidth / 2,
 					(height.get() + dividerWidth.get() + laneWidth.get()) / 2 + i * laneWidth.get()));
 
-			/** Set Path **/
-
-			/*
-			 * tf.setCarPath(new LinearPath(tf.getCarSpawnPoint().getX(),
-			 * tf.getCarSpawnPoint().getY(),
-			 * tf.getCarSpawnPoint().getX(),tf.getCarSpawnPoint().getY() +
-			 * tf.getLaneLength())); bf.setCarPath(new
-			 * LinearPath(bf.getCarSpawnPoint().getX(), bf.getCarSpawnPoint().getY(),
-			 * bf.getCarSpawnPoint().getX(), bf.getCarSpawnPoint().getY() -
-			 * bf.getLaneLength())); lf.setCarPath(new
-			 * LinearPath(lf.getCarSpawnPoint().getX(), lf.getCarSpawnPoint().getY(),
-			 * lf.getCarSpawnPoint().getX() + lf.getLaneLength(),
-			 * lf.getCarSpawnPoint().getY())); rf.setCarPath(new
-			 * LinearPath(rf.getCarSpawnPoint().getX(), rf.getCarSpawnPoint().getY(),
-			 * rf.getCarSpawnPoint().getX() +
-			 * rf.getLaneLength(),rf.getCarSpawnPoint().getY()));
-			 * 
-			 * tb.setCarPath(new LinearPath(tb.getRegion().getX(), verticalRoadHeight -
-			 * Car.getImageWidth()/2,tb.getRegion().getX(), - Car.getImageWidth()/2));
-			 * bb.setCarPath(new LinearPath(bb.getRegion().getX(), -
-			 * Car.getImageWidth(),tb.getRegion().getX(), - Car.getImageWidth()));
-			 * tb.setCarPath(new LinearPath(tb.getRegion().getX(), verticalRoadHeight -
-			 * Car.getImageWidth(),tb.getRegion().getX(), - Car.getImageWidth()));
-			 * tb.setCarPath(new LinearPath(tb.getRegion().getX(), verticalRoadHeight -
-			 * Car.getImageWidth(),tb.getRegion().getX(), - Car.getImageWidth()));
-			 */
-
 		}
 
 		/** Set dividers **/
@@ -225,14 +198,13 @@ public class Map implements ChangeListener<Number> {
 		double trafficLightHeight = numberOfLanes * laneWidth.get();
 
 		roads[0].getTrafficLight().getRegion().setAll((width.get() + dividerWidth.get() + 6 * laneWidth.get() / 2) / 2,
-				verticalRoadLength - trafficLightWidth.get() / 2, trafficLightHeight, trafficLightWidth.get());
+				verticalRoadLength, trafficLightHeight, trafficLightWidth.get());
 		roads[1].getTrafficLight().getRegion().setAll((width.get() - dividerWidth.get() - 6 * laneWidth.get() / 2) / 2,
-				height.get() - verticalRoadLength + trafficLightWidth.get() / 2, trafficLightHeight,
-				trafficLightWidth.get());
-		roads[2].getTrafficLight().getRegion().setAll(horizontalRoadLength - trafficLightWidth.get() / 2,
+				height.get() - verticalRoadLength, trafficLightHeight, trafficLightWidth.get());
+		roads[2].getTrafficLight().getRegion().setAll(horizontalRoadLength,
 				(height.get() - dividerWidth.get() - 6 * laneWidth.get() / 2) / 2, trafficLightWidth.get(),
 				trafficLightHeight);
-		roads[3].getTrafficLight().getRegion().setAll(width.get() - horizontalRoadLength + trafficLightWidth.get() / 2,
+		roads[3].getTrafficLight().getRegion().setAll(width.get() - horizontalRoadLength,
 				(height.get() + dividerWidth.get() + 6 * laneWidth.get() / 2) / 2, trafficLightWidth.get(),
 				trafficLightHeight);
 
