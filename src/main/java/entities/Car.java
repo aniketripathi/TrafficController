@@ -12,6 +12,8 @@ import main.java.util.Scale;
 
 public class Car extends Vehicle {
 
+	private Type type = Type.CAR;
+
 	private static final String IMAGE_TOP_TO_BOTTOM_URL = "/main/resources/images/car_top_to_bottom.png";
 	private static final String IMAGE_BOTTOM_TO_TOP_URL = "/main/resources/images/car_bottom_to_top.png";
 	private static final String IMAGE_LEFT_TO_RIGHT_URL = "/main/resources/images/car_left_to_right.png";
@@ -31,9 +33,9 @@ public class Car extends Vehicle {
 	private Image image_right_to_left = new Image(IMAGE_RIGHT_TO_LEFT_URL, Car.getImageWidth(), Car.getImageHeight(),
 			false, false);
 
-	public Car(Road currentRoad, ForwardLane sourceLane, Road destinationRoad, BackwardLane destinationLane,
+	public Car(Road sourceRoad, ForwardLane sourceLane, Road destinationRoad, BackwardLane destinationLane,
 			Crossing crossing, DoubleProperty mapWidth, DoubleProperty mapHeight) {
-		super(currentRoad, sourceLane, destinationRoad, destinationLane, crossing, mapWidth, mapHeight);
+		super(sourceRoad, sourceLane, destinationRoad, destinationLane, crossing, mapWidth, mapHeight);
 
 		this.getRegion().setX(sourceLane.getCarSpawnPoint().getX());
 		this.getRegion().setY(sourceLane.getCarSpawnPoint().getY());
@@ -107,4 +109,7 @@ public class Car extends Vehicle {
 
 	}
 
+	public Type getType() {
+		return this.type;
+	}
 }

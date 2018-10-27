@@ -13,6 +13,8 @@ public class HeavyVehicle extends Vehicle {
 
 	private Image image;
 
+	private Type type = Type.HEAVY_VEHICLE;
+
 	private static final String IMAGE_TOP_TO_BOTTOM_URL = "/main/resources/images/heavy_vehicle_top_to_bottom.png";
 
 	public static DoubleProperty imageWidth = new SimpleDoubleProperty(
@@ -23,9 +25,9 @@ public class HeavyVehicle extends Vehicle {
 	private Image image_top_to_bottom = new Image(IMAGE_TOP_TO_BOTTOM_URL, HeavyVehicle.getImageWidth(),
 			HeavyVehicle.getImageHeight(), false, false);
 
-	public HeavyVehicle(Road currentRoad, ForwardLane sourceLane, Road destinationRoad, BackwardLane destinationLane,
+	public HeavyVehicle(Road sourceRoad, ForwardLane sourceLane, Road destinationRoad, BackwardLane destinationLane,
 			Crossing crossing, DoubleProperty mapWidth, DoubleProperty mapHeight) {
-		super(currentRoad, sourceLane, destinationRoad, destinationLane, crossing, mapWidth, mapHeight);
+		super(sourceRoad, sourceLane, destinationRoad, destinationLane, crossing, mapWidth, mapHeight);
 		this.getRegion().setX(sourceLane.getHeavyVehicleSpawnPoint().getX());
 		this.getRegion().setY(sourceLane.getHeavyVehicleSpawnPoint().getY());
 
@@ -112,4 +114,7 @@ public class HeavyVehicle extends Vehicle {
 
 	}
 
+	public Type getType() {
+		return this.type;
+	}
 }

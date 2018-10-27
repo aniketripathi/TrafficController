@@ -3,18 +3,21 @@ package main.java.entities;
 import javafx.beans.property.DoubleProperty;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
+import main.java.entities.Vehicle.Type;
 import main.java.map.Crossing;
 
 public class TwoWheeler extends Vehicle {
+
+	private Type type = Type.TWO_WHEELER;
 
 	private static double imageWidth = 40;
 	private static double imageHeight = 40;
 
 	private Image image;
 
-	public TwoWheeler(Road currentRoad, ForwardLane sourceLane, Road destinationRoad, BackwardLane destinationLane,
+	public TwoWheeler(Road sourceRoad, ForwardLane sourceLane, Road destinationRoad, BackwardLane destinationLane,
 			Crossing crossing, DoubleProperty mapWidth, DoubleProperty mapHeight) {
-		super(currentRoad, sourceLane, destinationRoad, destinationLane, crossing, mapWidth, mapHeight);
+		super(sourceRoad, sourceLane, destinationRoad, destinationLane, crossing, mapWidth, mapHeight);
 		// TODO Auto-generated constructor stub
 	}
 
@@ -54,4 +57,7 @@ public class TwoWheeler extends Vehicle {
 
 	}
 
+	public Type getType() {
+		return this.type;
+	}
 }
