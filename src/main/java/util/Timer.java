@@ -8,26 +8,28 @@ package main.java.util;
  *         passed since it was initialized. The rate of flow of time can be
  *         varied by using doubleRate() and halfRate() methods. The timer by
  *         default does not include the time passed during when it was stopped.
- *         To get actual time use getFromStartNanos() method.
+ *         To get actual time use getFromStartNanos() method. The class is
+ *         thread safe.
  */
-public final class Timer {
+public class Timer {
 
-	private long initialTime;
-	private long lastCalculatedTime;
-	private long elapsedTime;
-	private float rate;
-	private boolean stopped;
-	private boolean initialised;
-	public static float MAX_RATE = 4f;
-	public static float MIN_RATE = 0.25f;
-	public static float DEFAULT_RATE = 1;
+	private volatile long initialTime;
+	private volatile long lastCalculatedTime;
+	private volatile long elapsedTime;
+	private volatile float rate;
+	private volatile boolean stopped;
+	private volatile boolean initialized;
+	public static final float MAX_RATE = 4f;
+	public static final float MIN_RATE = 0.25f;
+	public static final float DEFAULT_RATE = 1;
+	public static final long SECOND_TO_NANOS = 1000_000_000L;
 
 	/**
 	 * A Constructor for initialization of timer.
 	 */
 	public Timer() {
 		stopped = true;
-		initialised = false;
+		initialized = false;
 		initialTime = 0;
 		lastCalculatedTime = 0;
 		elapsedTime = 0;
@@ -40,26 +42,28 @@ public final class Timer {
 	 * method. The time passed during the stop duration will be ignored when elapsed
 	 * time is calculated using getElapsedNanos() method.
 	 */
-	public void stop() {
+	public synchronized void stop() {
 
 		calculateElapsedNanos();
-		stopped = true;
+		this.setStopped(true);
+
 	}
 
 	/**
 	 * Starts the timer.
 	 */
-	public void start() {
+	public synchronized void start() {
 
-		if (stopped) {
+		if (this.isStopped()) {
 			long now = System.nanoTime();
-			if (!initialised) {
-				initialTime = now;
-				initialised = true;
+			if (!this.isInitialized()) {
+				this.setInitialTime(now);
+				this.setInitialized(true);
 			}
 
-			lastCalculatedTime = now;
-			stopped = false;
+			setLastCalculatedTime(now);
+			setStopped(false);
+
 		}
 	}
 
@@ -68,30 +72,37 @@ public final class Timer {
 	 * DEFAULT_RATE. If the value of isStopped() is false when this is invoked, this
 	 * method will first stop the timer and then reset it.
 	 */
-	public void reset() {
+	public synchronized void reset() {
+
+		clearTimer();
+		setRate(DEFAULT_RATE);
+	}
+
+	/** This method is similar to reset but it does not changes the rate **/
+	protected synchronized void clearTimer() {
 		this.stop();
-		initialised = false;
-		initialTime = 0;
-		lastCalculatedTime = 0;
-		elapsedTime = 0;
-		rate = DEFAULT_RATE;
+		setInitialized(false);
+		setInitialTime(0);
+		setLastCalculatedTime(0);
+		setElapsedTime(0);
+
 	}
 
 	/**
 	 * Doubles the speed of timer. The rate cannot exceed MAX_RATE.
 	 */
-	public void doubleRate() {
+	public synchronized void doubleRate() {
 		calculateElapsedNanos();
-		rate = Math.min(MAX_RATE, rate * 2);
+		setRate(Math.min(MAX_RATE, rate * 2));
 	}
 
 	/**
 	 * Set the rate of timer to its half of original rate. The rate cannot be less
 	 * than MIN_RATE.
 	 */
-	public void halfRate() {
+	public synchronized void halfRate() {
 		calculateElapsedNanos();
-		rate = Math.max(MIN_RATE, rate / 2);
+		setRate(Math.max(MIN_RATE, rate / 2));
 
 	}
 
@@ -102,11 +113,13 @@ public final class Timer {
 	 * triggered which changes the natural flow of time like stop(), halfRate() and
 	 * doubleRate().
 	 */
-	protected void calculateElapsedNanos() {
-		if (!stopped) {
+	private void calculateElapsedNanos() {
+		if (!isStopped()) {
 			long now = System.nanoTime();
-			elapsedTime += ((now - lastCalculatedTime) * rate);
-			lastCalculatedTime = now;
+			synchronized (this) {
+				setElapsedTime(getElapsedTime() + (long) ((now - getLastCalculatedTime()) * rate));
+				setLastCalculatedTime(now);
+			}
 		}
 	}
 
@@ -115,7 +128,7 @@ public final class Timer {
 	 * 
 	 * @return True if timer is stopped otherwise false.
 	 */
-	public boolean isStopped() {
+	public synchronized boolean isStopped() {
 		return stopped;
 	}
 
@@ -125,8 +138,8 @@ public final class Timer {
 	 * 
 	 * @return A float value between MAX_RATE and MIN_RATE.
 	 */
-	public float getRate() {
-		return rate;
+	public synchronized float getRate() {
+		return this.rate;
 	}
 
 	/**
@@ -137,9 +150,9 @@ public final class Timer {
 	 *         first started.
 	 */
 	public long getElapsedNanos() {
-		if (!stopped)
+		if (!isStopped())
 			calculateElapsedNanos();
-		return elapsedTime;
+		return getElapsedTime();
 	}
 
 	/**
@@ -152,6 +165,47 @@ public final class Timer {
 	 *         created or reset().
 	 */
 	public long getFromStartNanos() {
-		return (System.nanoTime() - initialTime);
+		return (System.nanoTime() - getInitialTime());
 	}
+
+	private synchronized void setRate(float rate) {
+		this.rate = rate;
+	}
+
+	public synchronized boolean isInitialized() {
+		return this.initialized;
+	}
+
+	private synchronized void setInitialized(boolean initialized) {
+		this.initialized = initialized;
+	}
+
+	private synchronized void setStopped(boolean stopped) {
+		this.stopped = stopped;
+	}
+
+	private synchronized long getInitialTime() {
+		return this.initialTime;
+	}
+
+	private synchronized void setInitialTime(long initalTime) {
+		this.initialTime = initialTime;
+	}
+
+	private synchronized long getElapsedTime() {
+		return elapsedTime;
+	}
+
+	private synchronized void setElapsedTime(long elapsedTime) {
+		this.elapsedTime = elapsedTime;
+	}
+
+	private synchronized long getLastCalculatedTime() {
+		return this.lastCalculatedTime;
+	}
+
+	private synchronized void setLastCalculatedTime(long lastCalculatedTime) {
+		this.lastCalculatedTime = lastCalculatedTime;
+	}
+
 }
