@@ -1,5 +1,9 @@
 package main.java.entities;
 
+import java.util.LinkedList;
+import java.util.ListIterator;
+import java.util.NoSuchElementException;
+
 import javafx.scene.canvas.GraphicsContext;
 import main.java.util.LinearPath;
 import main.java.util.Path;
@@ -13,11 +17,16 @@ public abstract class Lane {
 
 	private Road road;
 	private double laneLength;
-	private double remainingLength;
 	private Path carPath;
 	private Path twoWheelerPath;
 	private Path heavyVehiclePath;
 	private int index;
+
+	/**
+	 * The vehicle that entered first will be at the head of the queue. New vehicles
+	 * should be added at the end of the queue.
+	 */
+	private LinkedList<Vehicle> queue;
 
 	// private static final int queueSize = 100;
 
@@ -27,7 +36,8 @@ public abstract class Lane {
 		region = new Region();
 		this.index = index;
 		this.laneLength = 0;
-		this.remainingLength = 0;
+		this.laneLength = 0;
+		queue = new LinkedList<Vehicle>();
 
 	}
 
@@ -83,17 +93,6 @@ public abstract class Lane {
 		this.laneLength = laneLength;
 	}
 
-	public double getRemainingLength() {
-		return remainingLength;
-	}
-
-	/** Always lies between 0 and laneLength **/
-
-	public void setRemainingLength(double remainingLength) {
-		this.remainingLength = Math.max(0, remainingLength);
-		this.remainingLength = Math.min(this.remainingLength, laneLength);
-	}
-
 	public Path getCarPath() {
 		return carPath;
 	}
@@ -119,4 +118,58 @@ public abstract class Lane {
 		this.heavyVehiclePath = heavyVehiclePath;
 	}
 
+	protected LinkedList<Vehicle> getQueue() {
+		return this.queue;
+	}
+
+	/** Vehicle will be added to the end of the list **/
+	public void addVehicle(Vehicle vehicle) {
+		queue.add(vehicle);
+	}
+
+	public void removeVehicle(Vehicle vehicle) {
+		queue.remove(vehicle);
+	}
+
+	public ListIterator<Vehicle> listIterator() {
+		return queue.listIterator();
+	}
+
+	public ListIterator<Vehicle> listIterator(int index) {
+		return queue.listIterator(index);
+	}
+
+	public void clearQueue() {
+		queue.clear();
+	}
+
+	public int getVehicleIndex(Vehicle vehicle) {
+		return queue.indexOf(vehicle);
+	}
+
+	public Vehicle getVehicleAt(int index) {
+		return queue.get(index);
+	}
+
+	/** Get the vehicle that was added least recently **/
+	public Vehicle getFirst() {
+		try {
+			return queue.getFirst();
+		} catch (NoSuchElementException e) {
+			return null;
+		}
+	}
+
+	/** Get the vehicle that was added most recently **/
+	public Vehicle getLast() {
+		try {
+			return queue.getLast();
+		} catch (NoSuchElementException e) {
+			return null;
+		}
+	}
+
+	public boolean isEmpty() {
+		return queue.isEmpty();
+	}
 }
