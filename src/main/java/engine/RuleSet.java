@@ -47,6 +47,10 @@ public class RuleSet {
 		return laneToRoadMapping[sourceRoadType.getIndex()][sourceLane];
 	}
 
+	public int getDestinationRoad(int sourceRoad, int sourceLane) {
+		return laneToRoadMapping[sourceRoad][sourceLane];
+	}
+
 	public int getNumberOfRoads() {
 		return laneToRoadMapping.length;
 	}

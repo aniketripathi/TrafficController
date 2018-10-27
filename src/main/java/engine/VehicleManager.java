@@ -61,7 +61,7 @@ public class VehicleManager {
 			BackwardLane destinationLane, Crossing crossing, DoubleProperty mapWidth, DoubleProperty mapHeight) {
 		TwoWheeler twoWheeler;
 
-		if (isCarPoolEmpty())
+		if (isTwoWheelerPoolEmpty())
 			twoWheeler = new TwoWheeler(currentRoad, sourceLane, destinationRoad, destinationLane, crossing, mapWidth,
 					mapHeight);
 
@@ -81,7 +81,7 @@ public class VehicleManager {
 			BackwardLane destinationLane, Crossing crossing, DoubleProperty mapWidth, DoubleProperty mapHeight) {
 		HeavyVehicle heavyVehicle;
 
-		if (isCarPoolEmpty())
+		if (isHeavyVehiclePoolEmpty())
 			heavyVehicle = new HeavyVehicle(currentRoad, sourceLane, destinationRoad, destinationLane, crossing,
 					mapWidth, mapHeight);
 
@@ -107,6 +107,24 @@ public class VehicleManager {
 			heavyVehiclePool.addLast((HeavyVehicle) vehicle);
 		}
 
+	}
+
+	public void clearCarPool() {
+		carPool.clear();
+	}
+
+	public void clearTwoWheelerPool() {
+		twoWheelerPool.clear();
+	}
+
+	public void clearHeavyVehiclePool() {
+		heavyVehiclePool.clear();
+	}
+
+	public void clearAllPools() {
+		clearCarPool();
+		clearTwoWheelerPool();
+		clearHeavyVehiclePool();
 	}
 
 }

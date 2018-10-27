@@ -1,6 +1,7 @@
 package main.java.entities;
 
 import javafx.scene.paint.Color;
+import main.java.util.CountdownTimerEvent;
 import main.java.util.Region;
 
 public class TrafficLight {
@@ -20,16 +21,18 @@ public class TrafficLight {
 	}
 
 	private boolean enabled = false;
-	private LightColor color;
+	private volatile LightColor color;
 	private double timer;
 	private Region region;
-	public static final LightColor DEFAULT_COLOR = LightColor.GREEN;
+	private CountdownTimerEvent event;
+	public static final LightColor DEFAULT_COLOR = LightColor.RED;
 
 	public TrafficLight(boolean enabled) {
 		this.enabled = enabled;
 		this.timer = 0;
 		this.color = DEFAULT_COLOR;
 		this.region = new Region();
+		event = () -> this.setColor(LightColor.RED);
 	}
 
 	public TrafficLight() {
@@ -41,6 +44,10 @@ public class TrafficLight {
 		this.timer = 0;
 		this.color = DEFAULT_COLOR;
 		this.region = region;
+	}
+
+	public CountdownTimerEvent getCountdownTimerEvent() {
+		return this.event;
 	}
 
 	public double getTimer() {
@@ -67,7 +74,7 @@ public class TrafficLight {
 		return color;
 	}
 
-	public void setColor(LightColor color) {
+	public synchronized void setColor(LightColor color) {
 		this.color = color;
 	}
 

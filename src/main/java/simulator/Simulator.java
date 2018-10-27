@@ -76,27 +76,27 @@ public class Simulator {
 
 	public void pause() {
 		animationController.stop();
-		updater.getTimer().stop();
+		updater.pause();
 	}
 
 	public void play() {
 		animationController.start();
-		updater.getTimer().start();
+		updater.start();
 	}
 
 	public void stop() {
 		animationController.stop();
-		updater.getTimer().start();
+		updater.stop();
 	}
 
 	public void doubleSpeed() {
 		animationController.setRate(Math.max(MIN_RATE, Math.round(animationController.getRate() / 2)));
-		updater.getTimer().doubleRate();
+		updater.doubleRate();
 	}
 
 	public void halfSpeed() {
 		animationController.setRate(Math.min(MAX_RATE, animationController.getRate() * 2));
-		updater.getTimer().halfRate();
+		updater.halfRate();
 	}
 
 }
