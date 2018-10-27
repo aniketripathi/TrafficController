@@ -9,6 +9,7 @@ import java.util.ListIterator;
 import main.java.exceptions.InvalidConfigException;
 import main.java.data.Config.LaneProperty;
 import main.java.data.Config.RoadProperty;
+import main.java.entities.Road;
 
 public class ConfigReader {
 
@@ -87,6 +88,7 @@ public class ConfigReader {
 					laneReader(laneProperty, list.subList(iterator.nextIndex(), list.size()));
 
 				}
+
 			}
 		} catch (NumberFormatException e) {
 			throw new InvalidConfigException(InvalidConfigException.INVALID_VALUE_MESSAGE);
@@ -101,20 +103,28 @@ public class ConfigReader {
 
 		while (iterator.hasNext()) {
 
-			String stmt = iterator.next();
-			stmt = stmt.substring(stmt.indexOf(ConfigWriter.SEPARATOR) + 1);
-			if (stmt.equalsIgnoreCase(ConfigWriter.TOP_ROAD)) {
-				roadReader(config.getTopRoadProperty(), list.subList(iterator.nextIndex(), list.size()));
-			} else if (stmt.equalsIgnoreCase(ConfigWriter.BOTTOM_ROAD)) {
-				roadReader(config.getBottomRoadProperty(), list.subList(iterator.nextIndex(), list.size()));
+			String variable = iterator.next();
+			String stmt = variable.substring(variable.indexOf(ConfigWriter.SEPARATOR) + 1);
+			if (variable.toLowerCase().startsWith(ConfigWriter.ROAD_INDEX.toLowerCase())
+					&& Integer.valueOf(stmt) == Road.TYPE.TOP.getIndex()) {
+				roadReader(config.getRoadProperty(Integer.valueOf(stmt)),
+						list.subList(iterator.nextIndex(), list.size()));
+			} else if (variable.toLowerCase().startsWith(ConfigWriter.ROAD_INDEX.toLowerCase())
+					&& Integer.valueOf(stmt) == Road.TYPE.BOTTOM.getIndex()) {
+				roadReader(config.getRoadProperty(Integer.valueOf(stmt)),
+						list.subList(iterator.nextIndex(), list.size()));
 			}
 
-			else if (stmt.equalsIgnoreCase(ConfigWriter.TOP_ROAD)) {
-				roadReader(config.getBottomRoadProperty(), list.subList(iterator.nextIndex(), list.size()));
+			else if (variable.toLowerCase().startsWith(ConfigWriter.ROAD_INDEX.toLowerCase())
+					&& Integer.valueOf(stmt) == Road.TYPE.LEFT.getIndex()) {
+				roadReader(config.getRoadProperty(Integer.valueOf(stmt)),
+						list.subList(iterator.nextIndex(), list.size()));
 			}
 
-			else if (stmt.equalsIgnoreCase(ConfigWriter.TOP_ROAD)) {
-				roadReader(config.getBottomRoadProperty(), list.subList(iterator.nextIndex(), list.size()));
+			else if (variable.toLowerCase().startsWith(ConfigWriter.ROAD_INDEX.toLowerCase())
+					&& Integer.valueOf(stmt) == Road.TYPE.RIGHT.getIndex()) {
+				roadReader(config.getRoadProperty(Integer.valueOf(stmt)),
+						list.subList(iterator.nextIndex(), list.size()));
 			}
 		}
 	}

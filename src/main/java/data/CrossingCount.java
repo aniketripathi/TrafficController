@@ -2,6 +2,7 @@ package main.java.data;
 
 import javafx.beans.property.LongProperty;
 import javafx.beans.property.SimpleLongProperty;
+import main.java.map.Map;
 
 public class CrossingCount {
 
@@ -20,26 +21,20 @@ public class CrossingCount {
 	 * No binding due to performance reasons. Update the properties individually
 	 * without violating
 	 **/
-	private LongProperty totalCrossed;
-	private LongProperty onCrossingArea;
+	private VehicleCount totalCrossed;
+	private VehicleCount inCrossing;
 	private int numberOfLanes;
 
-	private static final int NUMBER_OF_ROADS = 4;
-	public static final int TOP_ROAD_INDEX = 0;
-	public static final int BOTTOM_ROAD_INDEX = 1;
-	public static final int LEFT_ROAD_INDEX = 2;
-	public static final int RIGHT_ROAD_INDEX = 3;
-
 	public CrossingCount(int numberOfLanes) {
-		totalCrossed = new SimpleLongProperty();
-		onCrossingArea = new SimpleLongProperty();
+		totalCrossed = new VehicleCount();
+		inCrossing = new VehicleCount();
 		this.numberOfLanes = numberOfLanes;
 
-		crossingDetail = new VehicleCount[NUMBER_OF_ROADS][numberOfLanes][NUMBER_OF_ROADS - 1][numberOfLanes];
+		crossingDetail = new VehicleCount[Map.NUMBER_OF_ROADS][numberOfLanes][Map.NUMBER_OF_ROADS - 1][numberOfLanes];
 
-		for (int i = 0; i < NUMBER_OF_ROADS; i++) {
+		for (int i = 0; i < Map.NUMBER_OF_ROADS; i++) {
 			for (int j = 0; j < numberOfLanes; j++) {
-				for (int k = 0; k < NUMBER_OF_ROADS - 1; k++) {
+				for (int k = 0; k < Map.NUMBER_OF_ROADS - 1; k++) {
 					for (int l = 0; l < numberOfLanes; l++) {
 						crossingDetail[i][j][k][l] = new VehicleCount();
 					}
@@ -50,12 +45,12 @@ public class CrossingCount {
 	}
 
 	public void reset() {
-		totalCrossed.set(0);
-		onCrossingArea.set(0);
+		totalCrossed.reset();
+		inCrossing.reset();
 
-		for (int i = 0; i < NUMBER_OF_ROADS; i++) {
+		for (int i = 0; i < Map.NUMBER_OF_ROADS; i++) {
 			for (int j = 0; j < numberOfLanes; j++) {
-				for (int k = 0; k < NUMBER_OF_ROADS - 1; k++) {
+				for (int k = 0; k < Map.NUMBER_OF_ROADS - 1; k++) {
 					for (int l = 0; l < numberOfLanes; l++) {
 						crossingDetail[i][j][k][l].reset();
 					}
@@ -65,11 +60,11 @@ public class CrossingCount {
 
 	}
 
-	public LongProperty getPresentProperty() {
-		return onCrossingArea;
+	public VehicleCount getInCrossingCount() {
+		return inCrossing;
 	}
 
-	public LongProperty getTotalCrossedProperty() {
+	public VehicleCount getTotalCrossedCount() {
 		return totalCrossed;
 	}
 
@@ -80,54 +75,6 @@ public class CrossingCount {
 	public VehicleCount getCrossingDetailCount(int sourceRoad, int sourceLane, int destinationRoad,
 			int destinationLane) {
 		return crossingDetail[sourceRoad][sourceLane][destinationRoad][destinationLane];
-	}
-
-	public VehicleCount getTopToBottomRoadCrossingDetail(int sourceLane, int destinationLane) {
-		return getCrossingDetailCount(TOP_ROAD_INDEX, sourceLane, BOTTOM_ROAD_INDEX, destinationLane);
-	}
-
-	public VehicleCount getTopToLeftRoadCrossingDetail(int sourceLane, int destinationLane) {
-		return getCrossingDetailCount(TOP_ROAD_INDEX, sourceLane, LEFT_ROAD_INDEX, destinationLane);
-	}
-
-	public VehicleCount getTopToRightRoadCrossingDetail(int sourceLane, int destinationLane) {
-		return getCrossingDetailCount(TOP_ROAD_INDEX, sourceLane, RIGHT_ROAD_INDEX, destinationLane);
-	}
-
-	public VehicleCount getBottomToTopRoadCrossingDetail(int sourceLane, int destinationLane) {
-		return getCrossingDetailCount(BOTTOM_ROAD_INDEX, sourceLane, TOP_ROAD_INDEX, destinationLane);
-	}
-
-	public VehicleCount getBottomToLeftRoadCrossingDetail(int sourceLane, int destinationLane) {
-		return getCrossingDetailCount(BOTTOM_ROAD_INDEX, sourceLane, LEFT_ROAD_INDEX, destinationLane);
-	}
-
-	public VehicleCount getBottomToRightRoadCrossingDetail(int sourceLane, int destinationLane) {
-		return getCrossingDetailCount(BOTTOM_ROAD_INDEX, sourceLane, RIGHT_ROAD_INDEX, destinationLane);
-	}
-
-	public VehicleCount getLeftToTopRoadCrossingDetail(int sourceLane, int destinationLane) {
-		return getCrossingDetailCount(LEFT_ROAD_INDEX, sourceLane, TOP_ROAD_INDEX, destinationLane);
-	}
-
-	public VehicleCount getLeftToBottomRoadCrossingDetail(int sourceLane, int destinationLane) {
-		return getCrossingDetailCount(LEFT_ROAD_INDEX, sourceLane, BOTTOM_ROAD_INDEX, destinationLane);
-	}
-
-	public VehicleCount getLeftToRightRoadCrossingDetail(int sourceLane, int destinationLane) {
-		return getCrossingDetailCount(LEFT_ROAD_INDEX, sourceLane, RIGHT_ROAD_INDEX, destinationLane);
-	}
-
-	public VehicleCount getRightToTopRoadCrossingDetail(int sourceLane, int destinationLane) {
-		return getCrossingDetailCount(RIGHT_ROAD_INDEX, sourceLane, TOP_ROAD_INDEX, destinationLane);
-	}
-
-	public VehicleCount getRightToBottomRoadCrossingDetail(int sourceLane, int destinationLane) {
-		return getCrossingDetailCount(RIGHT_ROAD_INDEX, sourceLane, BOTTOM_ROAD_INDEX, destinationLane);
-	}
-
-	public VehicleCount getRightToLeftCrossingDetail(int sourceLane, int destinationLane) {
-		return getCrossingDetailCount(RIGHT_ROAD_INDEX, sourceLane, LEFT_ROAD_INDEX, destinationLane);
 	}
 
 }

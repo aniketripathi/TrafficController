@@ -1,56 +1,56 @@
 package main.java.data;
 
+import main.java.map.Map;
+
 public class Recorder {
 
-	private RoadCount topRoad;
-	private RoadCount bottomRoad;
-	private RoadCount leftRoad;
-	private RoadCount rightRoad;
+	private RoadCount roads[];
 	private CrossingCount crossing;
 	private int numberOfLanes;
 
 	public Recorder(int numberOfLanes) {
 		this.numberOfLanes = numberOfLanes;
 
-		topRoad = new RoadCount(numberOfLanes);
-		bottomRoad = new RoadCount(numberOfLanes);
-		leftRoad = new RoadCount(numberOfLanes);
-		rightRoad = new RoadCount(numberOfLanes);
+		roads = new RoadCount[Map.NUMBER_OF_ROADS];
+		for (int i = 0; i < Map.NUMBER_OF_ROADS; i++) {
+			roads[i] = new RoadCount(numberOfLanes);
+		}
 		crossing = new CrossingCount(numberOfLanes);
 	}
 
 	public long getGenerated() {
-		return (topRoad.getTotalGeneratedProperty().get() + bottomRoad.getTotalGeneratedProperty().get()
-				+ leftRoad.getTotalGeneratedProperty().get() + rightRoad.getTotalGeneratedProperty().get());
+		long sum = 0;
+		for (RoadCount road : roads) {
+			sum += road.getTotalGeneratedProperty().get();
+		}
+		return sum;
 	}
 
 	public long getDestroyed() {
-		return (topRoad.getTotalDestroyedProperty().get() + bottomRoad.getTotalDestroyedProperty().get()
-				+ leftRoad.getTotalDestroyedProperty().get() + rightRoad.getTotalDestroyedProperty().get());
+		long sum = 0;
+		for (RoadCount road : roads) {
+			sum += road.getTotalDestroyedProperty().get();
+		}
+		return sum;
 	}
 
 	public long onMap() {
 		return (getGenerated() - getDestroyed());
 	}
 
-	public RoadCount getTopRoadCount() {
-		return topRoad;
+	public RoadCount getRoadCount(int index) {
+		return roads[index];
 	}
 
-	public RoadCount getBottomRoadCount() {
-		return bottomRoad;
-	}
-
-	public RoadCount getLeftRoadCount() {
-		return leftRoad;
-	}
-
-	public RoadCount getRightRoadCount() {
-		return rightRoad;
-	}
-
-	public CrossingCount getCrossingCountb() {
+	public CrossingCount getCrossingCount() {
 		return crossing;
+	}
+
+	public void reset() {
+		crossing.reset();
+		for (RoadCount road : roads) {
+			road.reset();
+		}
 	}
 
 	public int getNumberOfLanes() {

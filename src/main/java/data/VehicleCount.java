@@ -4,6 +4,7 @@ import javafx.beans.property.LongProperty;
 import javafx.beans.property.SimpleLongProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import main.java.entities.Vehicle;
 
 public class VehicleCount implements ChangeListener<Number> {
 	private final LongProperty car;
@@ -26,20 +27,24 @@ public class VehicleCount implements ChangeListener<Number> {
 		total.set(0);
 	}
 
-	// public LongProperty getCarProperty() {
-	// return car;
-//	}
-
-	public LongProperty getTwoWheelerProperty() {
-		return car;
-	}
-
-	public LongProperty getHeavyVehicleProperty() {
-		return car;
-	}
-
-	public LongProperty getTotalProperty() {
+	protected LongProperty getTotalProperty() {
 		return total;
+	}
+
+	public long getCarCount() {
+		return car.get();
+	}
+
+	public long getTwoWheelerCount() {
+		return twoWheeler.get();
+	}
+
+	public long getHeavyVehicleCount() {
+		return heavyVehicle.get();
+	}
+
+	public long getTotalCount() {
+		return total.get();
 	}
 
 	public void incrementCarCount() {
@@ -60,12 +65,40 @@ public class VehicleCount implements ChangeListener<Number> {
 		twoWheeler.set(twoWheeler.get() - 1);
 	}
 
-	public void incrementheavyVehicleCount() {
+	public void incrementHeavyVehicleCount() {
 		heavyVehicle.set(heavyVehicle.get() + 1);
 	}
 
 	public void decrementHeavyVehicleCount() {
 		heavyVehicle.set(heavyVehicle.get() + 1);
+	}
+
+	public void incrementCount(Vehicle.Type vehicleType) {
+		switch (vehicleType) {
+		case CAR:
+			incrementCarCount();
+			break;
+		case TWO_WHEELER:
+			incrementTwoWheelerCount();
+			break;
+		case HEAVY_VEHICLE:
+			incrementHeavyVehicleCount();
+			break;
+		}
+	}
+
+	public void decrementCount(Vehicle.Type vehicleType) {
+		switch (vehicleType) {
+		case CAR:
+			decrementCarCount();
+			break;
+		case TWO_WHEELER:
+			decrementTwoWheelerCount();
+			break;
+		case HEAVY_VEHICLE:
+			decrementHeavyVehicleCount();
+			break;
+		}
 	}
 
 	@Override

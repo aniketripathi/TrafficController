@@ -3,23 +3,23 @@ package main.java.data;
 public class BackwardLaneCount {
 
 	private VehicleCount destroyed;
-	private VehicleCount onLane;
+	private VehicleCount inLane;
 
 	public BackwardLaneCount() {
 		destroyed = new VehicleCount();
-		onLane = new VehicleCount();
+		inLane = new VehicleCount();
 	}
 
 	public VehicleCount getDestroyedCount() {
 		return destroyed;
 	}
 
-	public VehicleCount getPresentCount() {
-		return onLane;
+	public VehicleCount getInLaneCount() {
+		return inLane;
 	}
 
 	public void reset() {
 		destroyed.reset();
-		onLane.reset();
+		inLane.reset();
 	}
 }

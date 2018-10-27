@@ -3,24 +3,24 @@ package main.java.data;
 public class ForwardLaneCount {
 
 	private VehicleCount generated;
-	private VehicleCount onLane;
+	private VehicleCount inLane;
 
 	public ForwardLaneCount() {
 		generated = new VehicleCount();
-		onLane = new VehicleCount();
+		inLane = new VehicleCount();
 	}
 
 	public VehicleCount getGeneratedCount() {
 		return generated;
 	}
 
-	public VehicleCount getPresentCount() {
-		return onLane;
+	public VehicleCount getinLaneCount() {
+		return inLane;
 	}
 
 	public void reset() {
 		generated.reset();
-		onLane.reset();
+		inLane.reset();
 	}
 
 }

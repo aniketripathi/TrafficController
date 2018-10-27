@@ -5,6 +5,7 @@ import java.nio.file.Path;
 
 import main.java.exceptions.InvalidConfigException;
 import main.java.exceptions.ProbabilityException;
+import main.java.map.Map;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.value.ChangeListener;
@@ -23,7 +24,7 @@ public class Config {
 		public static final double DEFAULT_CAR_PROBABILITY = 0.5;
 		public static final double DEFAULT_TWO_WHEELER_PROBABILITY = 0.2;
 		public static final double DEFAULT_HEAVY_VEHICLE_PROBABILITY = 0.3;
-		public static final double DEFAULT_RATE = 0.0;
+		public static final double DEFAULT_RATE = 4;
 
 		private LaneProperty() {
 
@@ -170,44 +171,22 @@ public class Config {
 
 	}
 
-	private RoadProperty topRoadProperty;
-	private RoadProperty bottomRoadProperty;
-	private RoadProperty leftRoadProperty;
-	private RoadProperty rightRoadProperty;
+	private RoadProperty roads[];
 
 	public Config(int numberOfLanes) {
-		this(numberOfLanes, numberOfLanes, numberOfLanes, numberOfLanes);
+		roads = new RoadProperty[Map.NUMBER_OF_ROADS];
+		for (int i = 0; i < Map.NUMBER_OF_ROADS; i++) {
+			roads[i] = new RoadProperty(numberOfLanes);
+		}
 	}
 
-	public Config(int numberOfLanesTopRoad, int numberOfLanesBottomRoad, int numberOfLanesLeftRoad,
-			int numberOfLanesRightRoad) {
-		topRoadProperty = new RoadProperty(numberOfLanesTopRoad);
-		bottomRoadProperty = new RoadProperty(numberOfLanesBottomRoad);
-		leftRoadProperty = new RoadProperty(numberOfLanesLeftRoad);
-		rightRoadProperty = new RoadProperty(numberOfLanesRightRoad);
-	}
-
-	public RoadProperty getTopRoadProperty() {
-		return topRoadProperty;
-	}
-
-	public RoadProperty getBottomRoadProperty() {
-		return bottomRoadProperty;
-	}
-
-	public RoadProperty getLeftRoadProperty() {
-		return leftRoadProperty;
-	}
-
-	public RoadProperty getRightRoadProperty() {
-		return rightRoadProperty;
+	public RoadProperty getRoadProperty(int index) {
+		return roads[index];
 	}
 
 	public void validate() throws InvalidConfigException {
-		topRoadProperty.validate();
-		bottomRoadProperty.validate();
-		leftRoadProperty.validate();
-		rightRoadProperty.validate();
+		for (RoadProperty road : roads)
+			road.validate();
 	}
 
 	public void loadFromFile(Path file) throws IOException, InvalidConfigException {

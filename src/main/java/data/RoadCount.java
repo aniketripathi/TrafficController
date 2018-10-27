@@ -41,6 +41,9 @@ public class RoadCount implements ChangeListener<Number> {
 			forwardLanesCount[i].reset();
 			backwardLanesCount[i].reset();
 		}
+		total.set(0);
+		totalGenerated.set(0);
+		totalDestroyed.set(0);
 
 	}
 
@@ -48,7 +51,7 @@ public class RoadCount implements ChangeListener<Number> {
 		return numberOfLanes;
 	}
 
-	public LongProperty getTotalProperty() {
+	protected LongProperty getTotalProperty() {
 		return total;
 	}
 
@@ -60,11 +63,11 @@ public class RoadCount implements ChangeListener<Number> {
 		return backwardLanesCount[i];
 	}
 
-	public LongProperty getTotalGeneratedProperty() {
+	protected LongProperty getTotalGeneratedProperty() {
 		return totalGenerated;
 	}
 
-	public LongProperty getTotalDestroyedProperty() {
+	protected LongProperty getTotalDestroyedProperty() {
 		return totalDestroyed;
 	}
 
