@@ -1,4 +1,4 @@
-package main.java.data;
+package main.java.data.recorder;
 
 import javafx.beans.property.LongProperty;
 import javafx.beans.property.SimpleLongProperty;
@@ -32,7 +32,8 @@ public class RoadCount implements ChangeListener<Number> {
 				totalGenerated.set(totalDestroyed.get() - oldVal.longValue() + newVal.longValue());
 			});
 		}
-		total.addListener(this);
+		totalGenerated.addListener(this);
+		totalDestroyed.addListener(this);
 
 	}
 
@@ -73,7 +74,7 @@ public class RoadCount implements ChangeListener<Number> {
 
 	@Override
 	public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-		total.set(total.get() - oldValue.longValue() + newValue.longValue());
+		total.set(totalGenerated.get() + totalDestroyed.get());
 
 	}
 

@@ -1,7 +1,5 @@
-package main.java.data;
+package main.java.data.recorder;
 
-import javafx.beans.property.LongProperty;
-import javafx.beans.property.SimpleLongProperty;
 import main.java.map.Map;
 
 public class CrossingCount {
@@ -30,11 +28,11 @@ public class CrossingCount {
 		inCrossing = new VehicleCount();
 		this.numberOfLanes = numberOfLanes;
 
-		crossingDetail = new VehicleCount[Map.NUMBER_OF_ROADS][numberOfLanes][Map.NUMBER_OF_ROADS - 1][numberOfLanes];
+		crossingDetail = new VehicleCount[Map.NUMBER_OF_ROADS][numberOfLanes][Map.NUMBER_OF_ROADS][numberOfLanes];
 
 		for (int i = 0; i < Map.NUMBER_OF_ROADS; i++) {
 			for (int j = 0; j < numberOfLanes; j++) {
-				for (int k = 0; k < Map.NUMBER_OF_ROADS - 1; k++) {
+				for (int k = 0; k < Map.NUMBER_OF_ROADS; k++) {
 					for (int l = 0; l < numberOfLanes; l++) {
 						crossingDetail[i][j][k][l] = new VehicleCount();
 					}

@@ -1,4 +1,4 @@
-package main.java.data;
+package main.java.data.recorder;
 
 import main.java.map.Map;
 

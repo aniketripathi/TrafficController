@@ -1,4 +1,4 @@
-package main.java.data;
+package main.java.data.recorder;
 
 import javafx.beans.property.LongProperty;
 import javafx.beans.property.SimpleLongProperty;
@@ -18,6 +18,9 @@ public class VehicleCount implements ChangeListener<Number> {
 		heavyVehicle = new SimpleLongProperty(0);
 		total = new SimpleLongProperty(0);
 
+		car.addListener(this);
+		twoWheeler.addListener(this);
+		heavyVehicle.addListener(this);
 	}
 
 	public void reset() {

@@ -1,4 +1,4 @@
-package main.java.data;
+package main.java.data.config;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -7,8 +7,7 @@ import java.util.List;
 import java.util.ListIterator;
 
 import main.java.exceptions.InvalidConfigException;
-import main.java.data.Config.LaneProperty;
-import main.java.data.Config.RoadProperty;
+import main.java.exceptions.ProbabilityException;
 import main.java.entities.Road;
 
 public class ConfigReader {
@@ -33,7 +32,6 @@ public class ConfigReader {
 		ListIterator<String> iterator = list.listIterator();
 
 		try {
-
 			while (iterator.hasNext()) {
 
 				String stmt = iterator.next();
@@ -66,7 +64,10 @@ public class ConfigReader {
 				}
 
 			}
-		} catch (NumberFormatException e) {
+			laneProperty.validate();
+		}
+
+		catch (NumberFormatException | ProbabilityException n) {
 			throw new InvalidConfigException(InvalidConfigException.INVALID_VALUE_MESSAGE);
 		}
 

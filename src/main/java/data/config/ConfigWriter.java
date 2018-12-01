@@ -1,4 +1,4 @@
-package main.java.data;
+package main.java.data.config;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -24,7 +24,7 @@ public class ConfigWriter {
 	public static final String TERMINAL = ";";
 	public static final String SEPARATOR = "=";
 
-	public static List<String> laneWriter(int index, Config.LaneProperty laneProperty) {
+	public static List<String> laneWriter(int index, LaneProperty laneProperty) {
 		List<String> list = new LinkedList<String>();
 
 		list.add(LANE_INDEX + SEPARATOR + index + TERMINAL);
@@ -36,7 +36,7 @@ public class ConfigWriter {
 		return list;
 	}
 
-	public static List<String> roadWriter(int index, Config.RoadProperty roadProperty) {
+	public static List<String> roadWriter(int index, RoadProperty roadProperty) {
 
 		List<String> list = new LinkedList<String>();
 		list.add(ROAD_INDEX + SEPARATOR + index + TERMINAL);
