@@ -2,7 +2,7 @@ package main.java.util;
 
 public final class Scale {
 
-	public static double pixelToMeterRatio = 8;
+	public static double pixelToMeterRatio = 6;
 
 	/**
 	 * The car width and length is not taken according to project but real world
@@ -11,6 +11,8 @@ public final class Scale {
 	 */
 	public static final double CAR_WIDTH_METERS = 2.0;
 	public static final double CAR_LENGTH_METERS = 4.4;
+	public static final double TWO_WHEELER_WIDTH_METERS = 1.5;
+	public static final double TWO_WHEELER_LENGTH_METERS = 3;
 	public static final double HEAVY_VEHICLE_WIDTH_METERS = 2.5;
 	public static final double HEAVY_VEHICLE_LENGTH_METERS = 14;
 	public static final double LANE_WIDTH_METERS = 3.9;
@@ -22,12 +24,12 @@ public final class Scale {
 	};
 
 	public static double toMeters(double pixels) {
-		return (pixels * pixelToMeterRatio);
+		return (pixels / pixelToMeterRatio);
 
 	}
 
 	public static double toPixels(double meters) {
-		return (meters / pixelToMeterRatio);
+		return (meters * pixelToMeterRatio);
 	}
 
 }

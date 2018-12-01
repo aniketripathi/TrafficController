@@ -12,9 +12,7 @@ import main.java.entities.Car;
 import main.java.entities.ForwardLane;
 import main.java.entities.HeavyVehicle;
 import main.java.entities.Road;
-import main.java.entities.TwoWheeler;
-import main.java.util.LinearPath;
-import main.java.util.Scale;;
+import main.java.entities.TwoWheeler;;
 
 public class Map implements ChangeListener<Number> {
 
@@ -144,7 +142,9 @@ public class Map implements ChangeListener<Number> {
 			rf.setLaneLength(rf.getRegion().getWidth());
 			rb.setLaneLength(rb.getRegion().getWidth());
 
-			double carImageWidth = Scale.CAR_LENGTH_METERS * Scale.pixelToMeterRatio;
+			double carImageWidth = Car.getImageWidth();
+			double twoWheelerWidth = TwoWheeler.getImageWidth();
+			double heavyVehicleWidth = HeavyVehicle.getImageWidth();
 
 			/** Set Spawn Points **/
 			tf.setCarSpawnPoint(
@@ -152,33 +152,33 @@ public class Map implements ChangeListener<Number> {
 							-carImageWidth / 2));
 			tf.setTwoWheelerSpawnPoint(
 					new Point2D((width.get() + dividerWidth.get() + laneWidth.get()) / 2 + i * laneWidth.get(),
-							-TwoWheeler.getImageWidth() / 2));
+							-twoWheelerWidth / 2));
 			tf.setHeavyVehicleSpawnPoint(
 					new Point2D((width.get() + dividerWidth.get() + laneWidth.get()) / 2 + i * laneWidth.get(),
-							-HeavyVehicle.getImageWidth() / 2));
+							-heavyVehicleWidth / 2));
 
 			bf.setCarSpawnPoint(
 					new Point2D((width.get() - dividerWidth.get() - laneWidth.get()) / 2 - i * laneWidth.get(),
 							height.get() + carImageWidth / 2));
 			bf.setTwoWheelerSpawnPoint(
 					new Point2D((width.get() - dividerWidth.get() - laneWidth.get()) / 2 - i * laneWidth.get(),
-							height.get() + TwoWheeler.getImageWidth() / 2));
+							height.get() + twoWheelerWidth / 2));
 			bf.setHeavyVehicleSpawnPoint(
 					new Point2D((width.get() - dividerWidth.get() - laneWidth.get()) / 2 - i * laneWidth.get(),
-							height.get() + HeavyVehicle.getImageWidth() / 2));
+							height.get() + heavyVehicleWidth / 2));
 
 			lf.setCarSpawnPoint(new Point2D(-carImageWidth / 2,
 					(height.get() - dividerWidth.get() - laneWidth.get()) / 2 - i * laneWidth.get()));
-			lf.setTwoWheelerSpawnPoint(new Point2D(-TwoWheeler.getImageWidth() / 2,
+			lf.setTwoWheelerSpawnPoint(new Point2D(-twoWheelerWidth / 2,
 					(height.get() - dividerWidth.get() - laneWidth.get()) / 2 - i * laneWidth.get()));
-			lf.setHeavyVehicleSpawnPoint(new Point2D(-HeavyVehicle.getImageWidth() / 2,
+			lf.setHeavyVehicleSpawnPoint(new Point2D(-heavyVehicleWidth / 2,
 					(height.get() - dividerWidth.get() - laneWidth.get()) / 2 - i * laneWidth.get()));
 
 			rf.setCarSpawnPoint(new Point2D(width.get() + carImageWidth / 2,
 					(height.get() + dividerWidth.get() + laneWidth.get()) / 2 + i * laneWidth.get()));
-			rf.setTwoWheelerSpawnPoint(new Point2D(width.get() + carImageWidth / 2,
+			rf.setTwoWheelerSpawnPoint(new Point2D(width.get() + twoWheelerWidth / 2,
 					(height.get() + dividerWidth.get() + laneWidth.get()) / 2 + i * laneWidth.get()));
-			rf.setHeavyVehicleSpawnPoint(new Point2D(width.get() + carImageWidth / 2,
+			rf.setHeavyVehicleSpawnPoint(new Point2D(width.get() + heavyVehicleWidth / 2,
 					(height.get() + dividerWidth.get() + laneWidth.get()) / 2 + i * laneWidth.get()));
 
 		}
@@ -207,8 +207,6 @@ public class Map implements ChangeListener<Number> {
 		roads[3].getTrafficLight().getRegion().setAll(width.get() - horizontalRoadLength,
 				(height.get() + dividerWidth.get() + 6 * laneWidth.get() / 2) / 2, trafficLightWidth.get(),
 				trafficLightHeight);
-
-		/** set paths for crossing TODO here **/
 
 		laneSeparatorHeight = laneWidth.get() * LANE_TO_LANE_SEPARATOR_WIDTH_RATIO;
 		laneSeparatorWidth = laneWidth.get() * LANE_WIDTH_TO_LANE_SEPARATOR_HEIGHT_RATIO;

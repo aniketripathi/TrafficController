@@ -7,8 +7,8 @@ import javafx.beans.value.ObservableValue;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Label;
-import main.java.data.Config;
-import main.java.data.Recorder;
+import main.java.data.config.Config;
+import main.java.data.recorder.Recorder;
 import main.java.entities.BackwardLane;
 import main.java.entities.ForwardLane;
 import main.java.entities.Road;
@@ -38,8 +38,9 @@ public class Updater implements ChangeListener<Number> {
 	private boolean isStopped;
 	private boolean isPaused;
 
-	private Label label;
-
+	private Label timerValueLabel;
+	private Label generatedValueLabel;
+	private Label crossedValueLabel;
 	double canvasWidth;
 	double canvasTranslateY = 0;
 
@@ -62,9 +63,11 @@ public class Updater implements ChangeListener<Number> {
 	}
 
 	public Updater(Map map, Canvas canvas, VehicleManager vehicleManager, Config config, Recorder recorder,
-			Label timerValueLabel) {
+			Label timerValueLabel, Label generatedValueLabel, Label crossedValueLabel) {
 
-		this.label = timerValueLabel;
+		this.timerValueLabel = timerValueLabel;
+		this.generatedValueLabel = generatedValueLabel;
+		this.crossedValueLabel = crossedValueLabel;
 		this.timer = new Timer();
 		trafficTimer = new CountdownTimer(1);
 		vehicleGenerationTimer = new CountdownTimer[Map.NUMBER_OF_ROADS][map.getNumberOfLanes()];
@@ -86,7 +89,7 @@ public class Updater implements ChangeListener<Number> {
 				vehicleGenerationTimer[i][j] = new CountdownTimer(CountdownTimer.INFINITE);
 				generateVehicleEvent[i][j] = new GenerateVehicleEvent(i, j);
 				vehicleGenerationTimer[i][j].setCountdown(
-						(long) config.getRoadProperty(i).getLaneProperty(j).getRate() * CountdownTimer.SECOND_TO_NANOS,
+						(long) (Timer.SECOND_TO_NANOS / config.getRoadProperty(i).getLaneProperty(j).getRate()),
 						generateVehicleEvent[i][j]);
 			}
 		}
@@ -120,7 +123,7 @@ public class Updater implements ChangeListener<Number> {
 		trafficTimer.halfRate();
 		for (int i = 0; i < Map.NUMBER_OF_ROADS; i++) {
 			for (int j = 0; j < map.getNumberOfLanes(); j++) {
-				vehicleGenerationTimer[i][j].doubleRate();
+				vehicleGenerationTimer[i][j].halfRate();
 			}
 		}
 	}
@@ -137,9 +140,14 @@ public class Updater implements ChangeListener<Number> {
 			}
 		}
 		updateVehicles();
+		updateLabels();
 
-		label.setText(Double.toString(timer.getElapsedNanos() / (double) 1_000_000_000).toString());
+	}
 
+	private void updateLabels() {
+		timerValueLabel.setText(Double.toString(timer.getElapsedNanos() / (double) 1_000_000_000).toString());
+		generatedValueLabel.setText(Long.toString(recorder.getGenerated()));
+		crossedValueLabel.setText(Long.toString(recorder.getCrossingCount().getTotalCrossedCount().getTotalCount()));
 	}
 
 	private void updateVehicles() {
@@ -269,11 +277,11 @@ public class Updater implements ChangeListener<Number> {
 			sum = 1; // some dummy value;
 		}
 
-		double carFrac = config.getRoadProperty(sourceLane).getLaneProperty(sourceLane).getCarProbability()
+		double carFrac = config.getRoadProperty(sourceRoad).getLaneProperty(sourceLane).getCarProbability()
 				- carCount / sum;
-		double twoWheelerFrac = config.getRoadProperty(sourceLane).getLaneProperty(sourceLane)
+		double twoWheelerFrac = config.getRoadProperty(sourceRoad).getLaneProperty(sourceLane)
 				.getTwoWheelerProbability() - twoWheelerCount / sum;
-		double heavyVehicleFrac = config.getRoadProperty(sourceLane).getLaneProperty(sourceLane)
+		double heavyVehicleFrac = config.getRoadProperty(sourceRoad).getLaneProperty(sourceLane)
 				.getHeavyVehicleProbability() - heavyVehicleCount / sum;
 
 		double max = Math.max(Math.max(carFrac, twoWheelerFrac), heavyVehicleFrac);
@@ -285,15 +293,20 @@ public class Updater implements ChangeListener<Number> {
 				recorder.getRoadCount(sourceRoad).getForwardLaneCount(sourceLane).getGeneratedCount()
 						.incrementCarCount();
 				recorder.getRoadCount(sourceRoad).getForwardLaneCount(sourceLane).getinLaneCount().incrementCarCount();
+			} else {
+				vehicleManager.addToPool(vehicle);
 			}
+
 		} else if (MathEngine.isEqual(max, twoWheelerFrac)) {
-			vehicle = this.getVehicle(sourceRoad, sourceLane, Type.CAR);
+			vehicle = this.getVehicle(sourceRoad, sourceLane, Type.TWO_WHEELER);
 			if (vehicle != null && map.getRoad(sourceRoad).getForwardLane(sourceLane).isEnoughSpace(vehicle)) {
 				map.getRoad(sourceRoad).getForwardLane(sourceLane).addVehicle(vehicle);
 				recorder.getRoadCount(sourceRoad).getForwardLaneCount(sourceLane).getGeneratedCount()
 						.incrementTwoWheelerCount();
 				recorder.getRoadCount(sourceRoad).getForwardLaneCount(sourceLane).getinLaneCount()
 						.incrementTwoWheelerCount();
+			} else {
+				vehicleManager.addToPool(vehicle);
 			}
 
 		} else if (MathEngine.isEqual(max, heavyVehicleFrac)) {
@@ -304,7 +317,10 @@ public class Updater implements ChangeListener<Number> {
 						.incrementHeavyVehicleCount();
 				recorder.getRoadCount(sourceRoad).getForwardLaneCount(sourceLane).getinLaneCount()
 						.incrementHeavyVehicleCount();
+			} else {
+				vehicleManager.addToPool(vehicle);
 			}
+
 		}
 
 	}
@@ -440,4 +456,7 @@ public class Updater implements ChangeListener<Number> {
 		}
 	}
 
+	public void setConfig(Config config) {
+		this.config = config;
+	}
 }

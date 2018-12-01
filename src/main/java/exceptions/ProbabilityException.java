@@ -1,6 +1,6 @@
 package main.java.exceptions;
 
-public class ProbabilityException extends RuntimeException {
+public class ProbabilityException extends Exception {
 
 	/**
 	 * 

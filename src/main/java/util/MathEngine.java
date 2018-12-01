@@ -37,4 +37,8 @@ public class MathEngine {
 		return Math.sqrt(x * x + y * y);
 	}
 
+	/** Inclusive of min and max **/
+	public static boolean inRange(double value, double min, double max) {
+		return (MathEngine.isLargerEquals(value, min) && MathEngine.isSmallerEquals(value, max));
+	}
 }

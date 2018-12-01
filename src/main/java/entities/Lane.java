@@ -5,7 +5,6 @@ import java.util.ListIterator;
 import java.util.NoSuchElementException;
 
 import javafx.scene.canvas.GraphicsContext;
-import main.java.util.LinearPath;
 import main.java.util.Path;
 import main.java.util.Region;
 
@@ -124,7 +123,7 @@ public abstract class Lane {
 
 	/** Vehicle will be added to the end of the list **/
 	public void addVehicle(Vehicle vehicle) {
-		queue.add(vehicle);
+		queue.addLast(vehicle);
 	}
 
 	public void removeVehicle(Vehicle vehicle) {
@@ -171,5 +170,9 @@ public abstract class Lane {
 
 	public boolean isEmpty() {
 		return queue.isEmpty();
+	}
+
+	public int getQueueSize() {
+		return queue.size();
 	}
 }
