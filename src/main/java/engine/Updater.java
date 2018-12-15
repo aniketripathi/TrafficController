@@ -7,17 +7,23 @@ import javafx.beans.value.ObservableValue;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Label;
+import javafx.util.Pair;
+import main.java.algorithm.DynamicTrafficLight;
 import main.java.data.config.Config;
 import main.java.data.recorder.Recorder;
 import main.java.entities.BackwardLane;
 import main.java.entities.ForwardLane;
 import main.java.entities.Road;
+import main.java.entities.TrafficLight;
+import main.java.entities.TrafficLight.LightColor;
 import main.java.entities.Vehicle;
 import main.java.entities.Vehicle.Type;
 import main.java.map.Map;
+import main.java.simulator.Simulator;
 import main.java.util.CountdownTimer;
 import main.java.util.CountdownTimerEvent;
 import main.java.util.MathEngine;
+import main.java.util.SerialCountdown;
 import main.java.util.Timer;
 
 public class Updater implements ChangeListener<Number> {
@@ -28,11 +34,21 @@ public class Updater implements ChangeListener<Number> {
 	private Config config;
 	private Recorder recorder;
 	private RuleSet ruleSet;
-	private CountdownTimer trafficTimer;
+	private SerialCountdown trafficTimer;
 	private Timer timer;
-	private CountdownTimer[][] vehicleGenerationTimer;
+	private SerialCountdown switchTimer;
+	private SerialCountdown[][] vehicleGenerationTimer;
 	private boolean[][] generateVehicle;
 	private GenerateVehicleEvent[][] generateVehicleEvent;
+	private DynamicTrafficLight algo;
+	private int greenRoad;
+
+	private float averageQueueLength;
+	private float averageWaitingTime;
+	private long roadsWaitingTime[];
+	private float frameRate = Simulator.EXPECTED_FPS;
+	private long trafficTimerNanos;
+	private final long switchTime = (long) (Timer.SECOND_TO_NANOS * 1.5);
 
 	private boolean initialized;
 	private boolean isStopped;
@@ -41,6 +57,11 @@ public class Updater implements ChangeListener<Number> {
 	private Label timerValueLabel;
 	private Label generatedValueLabel;
 	private Label crossedValueLabel;
+	private Label fpsValueLabel;
+	private Label greenTimeValueLabel;
+	private Label AQLValueLabel;
+	private Label AWTValueLabel;
+
 	double canvasWidth;
 	double canvasTranslateY = 0;
 
@@ -62,17 +83,42 @@ public class Updater implements ChangeListener<Number> {
 		}
 	}
 
-	public Updater(Map map, Canvas canvas, VehicleManager vehicleManager, Config config, Recorder recorder,
-			Label timerValueLabel, Label generatedValueLabel, Label crossedValueLabel) {
+	private class TrafficTimerEvent implements CountdownTimerEvent {
+		private final int i;
 
+		public TrafficTimerEvent(int i) {
+			this.i = i;
+		}
+
+		public void run() {
+			map.getRoad(i).getTrafficLight().setColor(LightColor.RED);
+			roadsWaitingTime[i] = timer.getElapsedNanos();
+		}
+	}
+
+	public Updater(Map map, Canvas canvas, VehicleManager vehicleManager, Config config, Recorder recorder,
+			Label timerValueLabel, Label generatedValueLabel, Label crossedValueLabel, Label fpsValueLabel,
+			Label greenTimeValueLabel, Label AQLValueLabel, Label AWTValueLabel) {
+
+		this.algo = new DynamicTrafficLight();
 		this.timerValueLabel = timerValueLabel;
 		this.generatedValueLabel = generatedValueLabel;
 		this.crossedValueLabel = crossedValueLabel;
+		this.fpsValueLabel = fpsValueLabel;
+		this.greenTimeValueLabel = greenTimeValueLabel;
+		this.AQLValueLabel = AQLValueLabel;
+		this.AWTValueLabel = AWTValueLabel;
+
+		this.averageQueueLength = 0;
+		this.averageWaitingTime = 0;
 		this.timer = new Timer();
-		trafficTimer = new CountdownTimer(1);
-		vehicleGenerationTimer = new CountdownTimer[Map.NUMBER_OF_ROADS][map.getNumberOfLanes()];
+
+		trafficTimer = new SerialCountdown(1);
+		switchTimer = new SerialCountdown(1);
+		vehicleGenerationTimer = new SerialCountdown[Map.NUMBER_OF_ROADS][map.getNumberOfLanes()];
 		generateVehicle = new boolean[Map.NUMBER_OF_ROADS][map.getNumberOfLanes()];
 		generateVehicleEvent = new GenerateVehicleEvent[Map.NUMBER_OF_ROADS][map.getNumberOfLanes()];
+		roadsWaitingTime = new long[Map.NUMBER_OF_ROADS];
 
 		this.config = config;
 		this.recorder = recorder;
@@ -82,35 +128,45 @@ public class Updater implements ChangeListener<Number> {
 		this.ruleSet = new RuleSet(Map.NUMBER_OF_ROADS, map.getNumberOfLanes());
 		canvas.widthProperty().addListener(this);
 		canvas.heightProperty().addListener(this);
+		greenRoad = -1;
+		this.isPaused = true;
+		this.isStopped = false;
 
 		for (int i = 0; i < Map.NUMBER_OF_ROADS; i++) {
 			for (int j = 0; j < map.getNumberOfLanes(); j++) {
 				setGenerateVehicle(i, j, true);
-				vehicleGenerationTimer[i][j] = new CountdownTimer(CountdownTimer.INFINITE);
+				vehicleGenerationTimer[i][j] = new SerialCountdown(SerialCountdown.INFINITE);
 				generateVehicleEvent[i][j] = new GenerateVehicleEvent(i, j);
 				vehicleGenerationTimer[i][j].setCountdown(
 						(long) (Timer.SECOND_TO_NANOS / config.getRoadProperty(i).getLaneProperty(j).getRate()),
 						generateVehicleEvent[i][j]);
 			}
-		}
 
-		trafficTimer.setCountdown(50 * Timer.SECOND_TO_NANOS,
-				map.getRoad(2).getTrafficLight().getCountdownTimerEvent());
-		initialize();
+			map.getRoad(i).getTrafficLight().setCountdownTimerEvent(new TrafficTimerEvent(i));
+		}
 
 	}
 
-	private synchronized boolean getGenerateVehicle(int i, int j) {
+	private boolean getGenerateVehicle(int i, int j) {
 		return generateVehicle[i][j];
 	}
 
-	private synchronized void setGenerateVehicle(int i, int j, boolean value) {
+	private void setGenerateVehicle(int i, int j, boolean value) {
 		generateVehicle[i][j] = value;
+	}
+
+	public void setFrameRate(float fps) {
+		this.frameRate = fps;
+	}
+
+	public float getFrameRate() {
+		return this.frameRate;
 	}
 
 	public void doubleRate() {
 		timer.doubleRate();
 		trafficTimer.doubleRate();
+		switchTimer.doubleRate();
 		for (int i = 0; i < Map.NUMBER_OF_ROADS; i++) {
 			for (int j = 0; j < map.getNumberOfLanes(); j++) {
 				vehicleGenerationTimer[i][j].doubleRate();
@@ -121,6 +177,7 @@ public class Updater implements ChangeListener<Number> {
 	public void halfRate() {
 		timer.halfRate();
 		trafficTimer.halfRate();
+		switchTimer.halfRate();
 		for (int i = 0; i < Map.NUMBER_OF_ROADS; i++) {
 			for (int j = 0; j < map.getNumberOfLanes(); j++) {
 				vehicleGenerationTimer[i][j].halfRate();
@@ -131,23 +188,95 @@ public class Updater implements ChangeListener<Number> {
 	public void update() {
 
 		/** Vehicle Generation **/
+		int temp = 0;
+		float waitingTime = 0;
 		for (int i = 0; i < Map.NUMBER_OF_ROADS; i++) {
 			for (int j = 0; j < map.getNumberOfLanes(); j++) {
 				if (getGenerateVehicle(i, j)) {
 					generateVehicle(i, j);
 					setGenerateVehicle(i, j, false);
 				}
+				temp += map.getRoad(i).getForwardLane(j).getQueueSize();
+				map.getRoad(i).getForwardLane(j).updateQueues();
 			}
+			waitingTime += (timer.getElapsedNanos() - this.roadsWaitingTime[i]) / Timer.SECOND_TO_NANOS;
 		}
+		this.averageQueueLength = ((float) temp) / ((float) Map.NUMBER_OF_ROADS * map.getNumberOfLanes());
+		this.averageWaitingTime = waitingTime / (Map.NUMBER_OF_ROADS);
 		updateVehicles();
 		updateLabels();
+		updateTuples();
+		updateTimers();
 
 	}
 
+	public void updateTuples() {
+		for (int i = 0; i < Map.NUMBER_OF_ROADS; i++) {
+			int lane = 0;
+			for (int j = 1; j < map.getNumberOfLanes(); j++) {
+				if (map.getRoad(i).getForwardLane(j).getQueueSize() > map.getRoad(i).getForwardLane(lane)
+						.getQueueSize()) {
+					lane = j;
+				}
+			}
+			float waitingTime;
+			if (i == this.greenRoad) {
+				waitingTime = 0;
+			} else {
+				waitingTime = (timer.getElapsedNanos() - this.roadsWaitingTime[i]) * 1.0f / Timer.SECOND_TO_NANOS;
+			}
+
+			algo.updateRoadsInfo(i, map.getRoad(i).getForwardLane(lane).getQueueSize(), waitingTime,
+					config.getRoadProperty(i).getLaneProperty(lane).getRate());
+		}
+	}
+
+	public void updateTimers() {
+
+		// update tuples
+
+		trafficTimer.getCountdownRemaining();
+		for (int i = 0; i < Map.NUMBER_OF_ROADS; i++) {
+			for (int j = 0; j < map.getNumberOfLanes(); j++) {
+				this.vehicleGenerationTimer[i][j].getCountdownRemaining();
+			}
+			if (greenRoad == i) {
+				this.roadsWaitingTime[i] = timer.getElapsedNanos();
+			}
+		}
+
+		if (trafficTimer.isCountdownTerminated()) {
+			if (switchTimer.isCountdownInitialized()) {
+				switchTimer.start();
+			}
+			switchTimer.getCountdownRemaining();
+
+			if (switchTimer.isCountdownTerminated()) {
+				switchTimer.resetCountdown();
+				switchTimer.setCountdown(switchTime, null);
+				Pair<Integer, Float> pair = algo.staticTrafficLightAlgorithm();
+				greenRoad = pair.getKey();
+				trafficTimerNanos = (long) (pair.getValue() * Timer.SECOND_TO_NANOS);
+				map.getRoad(pair.getKey()).getTrafficLight().setColor(LightColor.GREEN);
+				trafficTimer.resetCountdown();
+				trafficTimer.setCountdown((long) (pair.getValue() * Timer.SECOND_TO_NANOS),
+						map.getRoad(pair.getKey()).getTrafficLight().getCountdownTimerEvent());
+				trafficTimer.start();
+			}
+		}
+	}
+
 	private void updateLabels() {
-		timerValueLabel.setText(Double.toString(timer.getElapsedNanos() / (double) 1_000_000_000).toString());
+
+		this.AQLValueLabel.setText(String.format("%.3f", this.averageQueueLength));
+		this.AWTValueLabel.setText(String.format("%.3f", this.averageWaitingTime));
+
+		timerValueLabel.setText(String.format("%.3f", timer.getElapsedNanos() / (double) 1_000_000_000));
 		generatedValueLabel.setText(Long.toString(recorder.getGenerated()));
 		crossedValueLabel.setText(Long.toString(recorder.getCrossingCount().getTotalCrossedCount().getTotalCount()));
+		this.fpsValueLabel.setText(String.format("%.1f", this.getFrameRate()));
+		this.greenTimeValueLabel
+				.setText(String.format("%.2f", trafficTimer.getCountdownRemaining() / (double) 1_000_000_000));
 	}
 
 	private void updateVehicles() {
@@ -156,24 +285,9 @@ public class Updater implements ChangeListener<Number> {
 			for (int j = 0; j < map.getNumberOfLanes(); j++) {
 				BackwardLane lane = map.getRoad(i).getBackwardLane(j);
 				ListIterator<Vehicle> iterator = lane.listIterator();
-				Vehicle nextVehicle = null;
-				if (iterator.hasNext()) {
-					Vehicle vehicle = iterator.next();
-					boolean beDestroyed = vehicle.update(nextVehicle, true);
-					nextVehicle = vehicle;
-					if (beDestroyed) {
-						iterator.remove();
-						vehicleManager.addToPool(vehicle);
-						recorder.getRoadCount(i).getBackwardLaneCount(j).getDestroyedCount()
-								.incrementCount(vehicle.getType());
-						recorder.getRoadCount(i).getBackwardLaneCount(j).getInLaneCount()
-								.decrementCount(vehicle.getType());
-					}
-				}
 				while (iterator.hasNext()) {
 					Vehicle vehicle = iterator.next();
-					boolean beDestroyed = vehicle.update(nextVehicle, false);
-					nextVehicle = vehicle;
+					boolean beDestroyed = vehicle.update();
 					if (beDestroyed) {
 						iterator.remove();
 						vehicleManager.addToPool(vehicle);
@@ -187,11 +301,11 @@ public class Updater implements ChangeListener<Number> {
 
 		}
 
-		for (int i = 0; i < map.getCrossing().getQueueSize(); i++) {
+		{
 			ListIterator<Vehicle> iterator = map.getCrossing().listIterator();
 			while (iterator.hasNext()) {
 				Vehicle vehicle = iterator.next();
-				boolean leftCrossing = vehicle.update(null, false);
+				boolean leftCrossing = vehicle.update();
 				if (leftCrossing) {
 					iterator.remove();
 					vehicle.getDestinationLane().addVehicle(vehicle);
@@ -202,10 +316,8 @@ public class Updater implements ChangeListener<Number> {
 									vehicle.getSourceLane().getIndex(), vehicle.getDestinationRoad().getIndex(),
 									vehicle.getDestinationLane().getIndex())
 							.incrementCount(vehicle.getType());
-
 				}
 			}
-
 		}
 
 		for (int i = 0; i < Map.NUMBER_OF_ROADS; i++) {
@@ -213,24 +325,13 @@ public class Updater implements ChangeListener<Number> {
 			for (int j = 0; j < map.getNumberOfLanes(); j++) {
 				ForwardLane lane = map.getRoad(i).getForwardLane(j);
 				ListIterator<Vehicle> iterator = lane.listIterator();
-				Vehicle nextVehicle = null;
-				if (iterator.hasNext()) {
-					Vehicle vehicle = iterator.next();
-					boolean enterCrossing = vehicle.update(nextVehicle, true);
-					nextVehicle = vehicle;
-					if (enterCrossing) {
-						recorder.getCrossingCount().getInCrossingCount().decrementCount(vehicle.getType());
-						iterator.remove();
-						map.getCrossing().addVehicle(vehicle);
-					}
-				}
-
 				while (iterator.hasNext()) {
 					Vehicle vehicle = iterator.next();
-					boolean enterCrossing = vehicle.update(nextVehicle, false);
-					nextVehicle = vehicle;
+					boolean enterCrossing = vehicle.update();
 					if (enterCrossing) {
-						recorder.getCrossingCount().getInCrossingCount().decrementCount(vehicle.getType());
+						recorder.getRoadCount(i).getForwardLaneCount(j).getinLaneCount()
+								.decrementCount(vehicle.getType());
+						recorder.getCrossingCount().getInCrossingCount().incrementCount(vehicle.getType());
 						iterator.remove();
 						map.getCrossing().addVehicle(vehicle);
 					}
@@ -288,8 +389,7 @@ public class Updater implements ChangeListener<Number> {
 
 		if (MathEngine.isEqual(max, carFrac)) {
 			vehicle = this.getVehicle(sourceRoad, sourceLane, Type.CAR);
-			if (vehicle != null && map.getRoad(sourceRoad).getForwardLane(sourceLane).isEnoughSpace(vehicle)) {
-				map.getRoad(sourceRoad).getForwardLane(sourceLane).addVehicle(vehicle);
+			if (vehicle != null && map.getRoad(sourceRoad).getForwardLane(sourceLane).addVehicle(vehicle)) {
 				recorder.getRoadCount(sourceRoad).getForwardLaneCount(sourceLane).getGeneratedCount()
 						.incrementCarCount();
 				recorder.getRoadCount(sourceRoad).getForwardLaneCount(sourceLane).getinLaneCount().incrementCarCount();
@@ -299,8 +399,8 @@ public class Updater implements ChangeListener<Number> {
 
 		} else if (MathEngine.isEqual(max, twoWheelerFrac)) {
 			vehicle = this.getVehicle(sourceRoad, sourceLane, Type.TWO_WHEELER);
-			if (vehicle != null && map.getRoad(sourceRoad).getForwardLane(sourceLane).isEnoughSpace(vehicle)) {
-				map.getRoad(sourceRoad).getForwardLane(sourceLane).addVehicle(vehicle);
+			if (vehicle != null && map.getRoad(sourceRoad).getForwardLane(sourceLane).addVehicle(vehicle)) {
+
 				recorder.getRoadCount(sourceRoad).getForwardLaneCount(sourceLane).getGeneratedCount()
 						.incrementTwoWheelerCount();
 				recorder.getRoadCount(sourceRoad).getForwardLaneCount(sourceLane).getinLaneCount()
@@ -311,8 +411,8 @@ public class Updater implements ChangeListener<Number> {
 
 		} else if (MathEngine.isEqual(max, heavyVehicleFrac)) {
 			vehicle = this.getVehicle(sourceRoad, sourceLane, Type.HEAVY_VEHICLE);
-			if (vehicle != null && map.getRoad(sourceRoad).getForwardLane(sourceLane).isEnoughSpace(vehicle)) {
-				map.getRoad(sourceRoad).getForwardLane(sourceLane).addVehicle(vehicle);
+			if (vehicle != null && map.getRoad(sourceRoad).getForwardLane(sourceLane).addVehicle(vehicle)) {
+
 				recorder.getRoadCount(sourceRoad).getForwardLaneCount(sourceLane).getGeneratedCount()
 						.incrementHeavyVehicleCount();
 				recorder.getRoadCount(sourceRoad).getForwardLaneCount(sourceLane).getinLaneCount()
@@ -400,16 +500,23 @@ public class Updater implements ChangeListener<Number> {
 	}
 
 	public void initialize() {
-		trafficTimer.startCountdown();
-		;
-		for (int i = 0; i < Map.NUMBER_OF_ROADS; i++) {
-			for (int j = 0; j < map.getNumberOfLanes(); j++) {
-				vehicleGenerationTimer[i][j].startCountdown();
-			}
+
+		if (!initialized) {
+			this.isStopped = false;
+			this.isPaused = true;
+			initialized = true;
+
+			updateTuples();
+			switchTimer.resetCountdown();
+			switchTimer.setCountdown(switchTime, null);
+			Pair<Integer, Float> pair = algo.staticTrafficLightAlgorithm();
+			greenRoad = pair.getKey();
+			map.getRoad(pair.getKey()).getTrafficLight().setColor(LightColor.GREEN);
+			trafficTimer.resetCountdown();
+			trafficTimer.setCountdown((long) (pair.getValue() * Timer.SECOND_TO_NANOS),
+					map.getRoad(pair.getKey()).getTrafficLight().getCountdownTimerEvent());
+
 		}
-		this.isStopped = false;
-		this.isPaused = true;
-		initialized = true;
 	}
 
 	public void stop() {
@@ -417,11 +524,13 @@ public class Updater implements ChangeListener<Number> {
 		if (isInitialized() && !isStopped()) {
 			timer.stop();
 			trafficTimer.stop();
-			trafficTimer.clearCountdown();
+			trafficTimer.reset();
+			switchTimer.stop();
+			switchTimer.reset();
 			for (int i = 0; i < Map.NUMBER_OF_ROADS; i++) {
 				for (int j = 0; j < map.getNumberOfLanes(); j++) {
 					vehicleGenerationTimer[i][j].stop();
-					vehicleGenerationTimer[i][j].clearCountdown();
+					vehicleGenerationTimer[i][j].resetCountdown();
 				}
 			}
 			isStopped = true;
@@ -429,6 +538,8 @@ public class Updater implements ChangeListener<Number> {
 	}
 
 	public void start() {
+
+		initialize();
 
 		if (isInitialized() && !isStopped() && isPaused()) {
 			timer.start();
@@ -447,6 +558,7 @@ public class Updater implements ChangeListener<Number> {
 		if (isInitialized() && !isStopped() && !isPaused()) {
 			timer.stop();
 			trafficTimer.stop();
+			switchTimer.stop();
 			for (int i = 0; i < Map.NUMBER_OF_ROADS; i++) {
 				for (int j = 0; j < map.getNumberOfLanes(); j++) {
 					vehicleGenerationTimer[i][j].stop();
@@ -458,5 +570,12 @@ public class Updater implements ChangeListener<Number> {
 
 	public void setConfig(Config config) {
 		this.config = config;
+		for (int i = 0; i < Map.NUMBER_OF_ROADS; i++) {
+			for (int j = 0; j < map.getNumberOfLanes(); j++) {
+				vehicleGenerationTimer[i][j].setCountdown(
+						(long) (Timer.SECOND_TO_NANOS / config.getRoadProperty(i).getLaneProperty(j).getRate()),
+						generateVehicleEvent[i][j]);
+			}
+		}
 	}
 }

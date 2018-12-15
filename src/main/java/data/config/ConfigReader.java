@@ -41,25 +41,24 @@ public class ConfigReader {
 				}
 
 				else if (stmt.toLowerCase().startsWith(ConfigWriter.CAR_PROBABILITY.toLowerCase())) {
-					double carProbability = Double
-							.parseDouble(stmt.substring(stmt.indexOf(ConfigWriter.SEPARATOR) + 1));
+					float carProbability = Float.parseFloat(stmt.substring(stmt.indexOf(ConfigWriter.SEPARATOR) + 1));
 					laneProperty.setCarProbability(carProbability);
 				}
 
 				else if (stmt.toLowerCase().startsWith(ConfigWriter.TWO_WHEELER_PROBABILITY.toLowerCase())) {
-					double twoWheelerProbability = Double
-							.parseDouble(stmt.substring(stmt.indexOf(ConfigWriter.SEPARATOR) + 1));
+					float twoWheelerProbability = Float
+							.parseFloat(stmt.substring(stmt.indexOf(ConfigWriter.SEPARATOR) + 1));
 					laneProperty.setTwoWheelerProbability(twoWheelerProbability);
 				}
 
 				else if (stmt.toLowerCase().startsWith(ConfigWriter.HEAVY_VEHICLE_PROBABILITY.toLowerCase())) {
-					double heavyVehicleProbability = Double
-							.parseDouble(stmt.substring(stmt.indexOf(ConfigWriter.SEPARATOR) + 1));
+					float heavyVehicleProbability = Float
+							.parseFloat(stmt.substring(stmt.indexOf(ConfigWriter.SEPARATOR) + 1));
 					laneProperty.setHeavyVehicleProbability(heavyVehicleProbability);
 				}
 
 				else if (stmt.toLowerCase().startsWith(ConfigWriter.RATE.toLowerCase())) {
-					double rate = Double.parseDouble(stmt.substring(stmt.indexOf(ConfigWriter.SEPARATOR) + 1));
+					float rate = Float.parseFloat(stmt.substring(stmt.indexOf(ConfigWriter.SEPARATOR) + 1));
 					laneProperty.setRate(rate);
 				}
 

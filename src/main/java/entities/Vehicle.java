@@ -78,8 +78,10 @@ public abstract class Vehicle {
 
 	private static double vehiclePadding = 5;
 	private static double trafficLightPadding = 5;
-	protected static double maxSpeed = 20;
-	protected static double crossingMaxSpeed = 5;
+
+	protected static double maxSpeed = 15;
+	protected static double maxCrossingSpeed = 12;
+	protected static double stepSpeed = 4;
 
 	public Vehicle(Road sourceRoad, ForwardLane sourceLane, Road destinationRoad, BackwardLane destinationLane,
 			Crossing crossing, DoubleProperty mapWidth, DoubleProperty mapHeight) {
@@ -112,6 +114,22 @@ public abstract class Vehicle {
 		accelerationY = 0;
 
 		updateDirection();
+	}
+
+	public static double getMaxSpeed() {
+		return maxSpeed;
+	}
+
+	public static double getMaxCrossingSpeed() {
+		return maxCrossingSpeed;
+	}
+
+	public static void setMaxSpeed(double speed) {
+		maxSpeed = speed;
+	}
+
+	public static void setMaxCrossingSpeed(double speed) {
+		maxCrossingSpeed = speed;
 	}
 
 	public Type getType() {
@@ -324,173 +342,80 @@ public abstract class Vehicle {
 		return this.direction;
 	}
 
-	private void forwardLaneVehicleUpdate(Vehicle nextVehicle, boolean isLastVehicle) {
+	private void forwardLaneVelocityUpdate() {
 		TrafficLight trafficLight = this.currentRoad.getTrafficLight();
 		switch (this.direction) {
 
 		case TOP_TO_BOTTOM:
 			this.setVelocityX(0);
-			if (isLastVehicle) {
-				if (trafficLight.isRed()) {
-					double gap = (trafficLight.getY() - trafficLight.getHeight() / 2)
-							- (this.getY() + this.getHeight() / 2);
-					if (MathEngine.isLarger(gap, Vehicle.trafficLightPadding))
-						this.setVelocityY(Math.min(Vehicle.maxSpeed, gap - trafficLightPadding));
-					else if (MathEngine.isSmaller(gap, 0))
-						this.setVelocityY(Vehicle.maxSpeed);
-					else
-						this.setVelocityY(0);
-				} else
+			if (trafficLight.isRed()) {
+				double yGap = (trafficLight.getY() - trafficLight.getHeight() / 2)
+						- (this.getY() + this.getHeight() / 2);
+				if (MathEngine.isSmallerEquals(yGap, 0)) {
 					this.setVelocityY(Vehicle.maxSpeed);
-			} else {
-				double nextVehicleSpeed = Math.abs(nextVehicle.getVelocityY());
-				double gap = (nextVehicle.getY() - nextVehicle.getHeight() / 2) - (this.getY() + this.getHeight() / 2);
-
-				if (nextVehicleSpeed > 0) {
-					if (MathEngine.isSmallerEquals(gap, Vehicle.vehiclePadding))
-						this.setVelocityY(nextVehicleSpeed);
-
-					else if (MathEngine.isLarger(gap, Vehicle.vehiclePadding))
-						this.setVelocityY(Vehicle.maxSpeed);
-
-					else
-						this.setVelocityY(0); // Not required as gap >= padding for cases but still used as emergency
-												// brake
-
-				} else if (MathEngine.isEqual(nextVehicleSpeed, 0)) {
-
-					if (MathEngine.isSmallerEquals(gap, Vehicle.vehiclePadding))
-						this.setVelocityY(0);
-
-					else if (MathEngine.isLarger(gap, Vehicle.vehiclePadding))
-						this.setVelocityY(Math.min(Vehicle.maxSpeed, gap - vehiclePadding));
 				}
+
+				else if (MathEngine.isLarger(yGap, trafficLightPadding)) {
+					this.setVelocityY(Math.min(yGap - trafficLightPadding, Vehicle.maxSpeed));
+				} else
+					this.setVelocityY(0);
+			} else {
+				this.setVelocityY(Vehicle.maxSpeed);
 			}
 
 			break;
 
 		case BOTTOM_TO_TOP:
 			this.setVelocityX(0);
-			if (isLastVehicle) {
-				if (trafficLight.isRed()) {
-					double gap = (this.getY() - this.getHeight() / 2)
-							- (trafficLight.getY() + trafficLight.getHeight() / 2);
-					if (MathEngine.isLarger(gap, Vehicle.trafficLightPadding))
-						this.setVelocityY(-Math.min(Vehicle.maxSpeed, gap - trafficLightPadding));
-					else if (MathEngine.isSmaller(gap, 0))
-						this.setVelocityY(-Vehicle.maxSpeed);
-					else
-						this.setVelocityY(0);
-				} else
+			if (trafficLight.isRed()) {
+				double yGap = (this.getY() - this.getHeight() / 2)
+						- (trafficLight.getY() + trafficLight.getHeight() / 2);
+				if (MathEngine.isSmallerEquals(yGap, 0)) {
 					this.setVelocityY(-Vehicle.maxSpeed);
-			} else {
-				double nextVehicleSpeed = Math.abs(nextVehicle.getVelocityY());
-				double gap = (this.getY() - this.getHeight() / 2) - (nextVehicle.getY() + nextVehicle.getHeight() / 2);
-
-				if (MathEngine.isLarger(nextVehicleSpeed, 0)) {
-					if (MathEngine.isSmallerEquals(gap, Vehicle.vehiclePadding))
-						this.setVelocityY(-nextVehicleSpeed);
-
-					else if (MathEngine.isLarger(gap, Vehicle.vehiclePadding))
-						this.setVelocityY(-Vehicle.maxSpeed);
-
-					else
-						this.setVelocityY(0); // Not required as gap >= padding for cases but still used as emergency
-												// brake
-
-				} else if (MathEngine.isEqual(nextVehicleSpeed, 0)) {
-
-					if (MathEngine.isSmallerEquals(gap, Vehicle.vehiclePadding))
-						this.setVelocityY(0);
-
-					else if (MathEngine.isLarger(gap, Vehicle.vehiclePadding))
-						this.setVelocityY(-Math.min(Vehicle.maxSpeed, gap - vehiclePadding));
 				}
+
+				else if (MathEngine.isLarger(yGap, trafficLightPadding)) {
+					this.setVelocityY(-Math.min(yGap - trafficLightPadding, Vehicle.maxSpeed));
+				} else
+					this.setVelocityY(0);
+			} else {
+				this.setVelocityY(-Vehicle.maxSpeed);
 			}
 
 			break;
 
 		case LEFT_TO_RIGHT:
 			this.setVelocityY(0);
-			if (isLastVehicle) {
-				if (trafficLight.isRed()) {
-					double gap = (trafficLight.getX() - trafficLight.getWidth() / 2)
-							- (this.getX() + this.getWidth() / 2);
-
-					if (MathEngine.isLarger(gap, Vehicle.trafficLightPadding))
-						this.setVelocityX(Math.min(Vehicle.maxSpeed, gap - trafficLightPadding));
-					else if (MathEngine.isSmaller(gap, 0))
-						this.setVelocityX(Vehicle.maxSpeed);
-					else
-						this.setVelocityX(0);
-				} else
+			if (trafficLight.isRed()) {
+				double xGap = (trafficLight.getX() - trafficLight.getWidth() / 2) - (this.getX() + this.getWidth() / 2);
+				if (MathEngine.isSmallerEquals(xGap, 0)) {
 					this.setVelocityX(Vehicle.maxSpeed);
-			} else {
-				double nextVehicleSpeed = Math.abs(nextVehicle.getVelocityX());
-				double gap = (nextVehicle.getX() - nextVehicle.getWidth() / 2) - (this.getX() + this.getWidth() / 2);
-
-				if (MathEngine.isLarger(nextVehicleSpeed, 0)) {
-					if (MathEngine.isEqual(gap, Vehicle.vehiclePadding)
-							|| MathEngine.isSmaller(gap, Vehicle.vehiclePadding))
-						this.setVelocityX(nextVehicleSpeed);
-
-					else if (MathEngine.isLarger(gap, Vehicle.vehiclePadding))
-						this.setVelocityX(Vehicle.maxSpeed);
-
-					else
-						this.setVelocityX(0); // Not required as the following condition gap >= padding must hold at all
-												// times but still used as emergency brake
-
-				} else if (MathEngine.isEqual(nextVehicleSpeed, 0)) {
-
-					if (MathEngine.isEqual(gap, Vehicle.vehiclePadding)
-							|| MathEngine.isSmaller(gap, Vehicle.vehiclePadding))
-						this.setVelocityX(0);
-
-					else if (MathEngine.isLarger(gap, Vehicle.vehiclePadding))
-						this.setVelocityX(Math.min(Vehicle.maxSpeed, gap - vehiclePadding));
 				}
+
+				else if (MathEngine.isLarger(xGap, trafficLightPadding)) {
+					this.setVelocityX(Math.min(xGap - trafficLightPadding, Vehicle.maxSpeed));
+				} else
+					this.setVelocityX(0);
+			} else {
+				this.setVelocityX(Vehicle.maxSpeed);
 			}
 
 			break;
 
 		case RIGHT_TO_LEFT:
 			this.setVelocityY(0);
-			if (isLastVehicle) {
-				if (trafficLight.isRed()) {
-					double gap = (this.getX() - this.getWidth() / 2)
-							- (trafficLight.getX() + trafficLight.getWidth() / 2);
-					if (MathEngine.isLarger(gap, Vehicle.trafficLightPadding))
-						this.setVelocityX(-Math.min(Vehicle.maxSpeed, gap - trafficLightPadding));
-					else if (MathEngine.isSmaller(gap, 0))
-						this.setVelocityX(-Vehicle.maxSpeed);
-					else
-						this.setVelocityX(0);
-				} else
+			if (trafficLight.isRed()) {
+				double xGap = (this.getX() - this.getWidth() / 2) - (trafficLight.getX() + trafficLight.getWidth() / 2);
+				if (MathEngine.isSmallerEquals(xGap, 0)) {
 					this.setVelocityX(-Vehicle.maxSpeed);
-			} else {
-				double nextVehicleSpeed = Math.abs(nextVehicle.getVelocityX());
-				double gap = (this.getX() - this.getWidth() / 2) - (nextVehicle.getX() + nextVehicle.getWidth() / 2);
-
-				if (MathEngine.isLarger(nextVehicleSpeed, 0)) {
-					if (MathEngine.isSmallerEquals(gap, Vehicle.vehiclePadding))
-						this.setVelocityX(-nextVehicleSpeed);
-
-					else if (MathEngine.isLarger(gap, Vehicle.vehiclePadding))
-						this.setVelocityX(-Vehicle.maxSpeed);
-
-					else
-						this.setVelocityX(0); // Not required as gap >= padding for cases but still used as emergency
-												// brake
-
-				} else if (MathEngine.isEqual(nextVehicleSpeed, 0)) {
-
-					if (MathEngine.isSmallerEquals(gap, Vehicle.vehiclePadding))
-						this.setVelocityX(0);
-
-					else if (MathEngine.isLarger(gap, Vehicle.vehiclePadding))
-						this.setVelocityX(-Math.min(Vehicle.maxSpeed, gap - vehiclePadding));
 				}
+
+				else if (MathEngine.isLarger(xGap, trafficLightPadding)) {
+					this.setVelocityX(-Math.min(xGap - trafficLightPadding, Vehicle.maxSpeed));
+				} else
+					this.setVelocityX(0);
+			} else {
+				this.setVelocityX(-Vehicle.maxSpeed);
 			}
 
 			break;
@@ -502,133 +427,26 @@ public abstract class Vehicle {
 		}
 	}
 
-	private void backwardLaneVehicleUpdate(Vehicle nextVehicle, boolean isLastVehicle) {
+	private void backwardLaneVelocityUpdate() {
 
 		switch (this.direction) {
 
 		case TOP_TO_BOTTOM:
 			this.setVelocityX(0);
-			if (isLastVehicle) {
-				this.setVelocityY(Vehicle.maxSpeed);
-			} else {
-				double nextVehicleSpeed = nextVehicle.getVelocityY();
-				double gap = (nextVehicle.getY() - nextVehicle.getHeight() / 2) - (this.getY() + this.getHeight() / 2);
-
-				if (MathEngine.isLarger(nextVehicleSpeed, 0)) {
-					if (gap == Vehicle.vehiclePadding)
-						this.setVelocityY(nextVehicleSpeed);
-
-					else if (MathEngine.isLarger(gap, Vehicle.vehiclePadding))
-						this.setVelocityY(Vehicle.maxSpeed);
-
-					else
-						this.setVelocityY(0); // Not required as gap >= padding for cases but still used as emergency
-												// brake
-
-				} else if (MathEngine.isEqual(nextVehicleSpeed, 0)) {
-
-					if (MathEngine.isSmallerEquals(gap, Vehicle.vehiclePadding))
-						this.setVelocityY(0);
-
-					else if (MathEngine.isLarger(gap, Vehicle.vehiclePadding))
-						this.setVelocityY(Math.min(Vehicle.maxSpeed, gap - vehiclePadding));
-				}
-			}
-
+			this.setVelocityY(Vehicle.maxSpeed);
 			break;
-
 		case BOTTOM_TO_TOP:
 			this.setVelocityX(0);
-			if (isLastVehicle) {
-				this.setVelocityY(-Vehicle.maxSpeed);
-			} else {
-				double nextVehicleSpeed = nextVehicle.getVelocityY();
-				double gap = (this.getY() - this.getHeight() / 2) - (nextVehicle.getY() + nextVehicle.getHeight() / 2);
-
-				if (MathEngine.isLargerEquals(nextVehicleSpeed, 0)) {
-					if (MathEngine.isEqual(gap, Vehicle.vehiclePadding))
-						this.setVelocityY(nextVehicleSpeed);
-
-					else if (MathEngine.isLarger(gap, Vehicle.vehiclePadding))
-						this.setVelocityY(-Vehicle.maxSpeed);
-
-					else
-						this.setVelocityY(0); // Not required as gap >= padding for cases but still used as emergency
-												// brake
-
-				} else if (MathEngine.isEqual(nextVehicleSpeed, 0)) {
-
-					if (MathEngine.isSmallerEquals(gap, Vehicle.vehiclePadding))
-						this.setVelocityY(0);
-
-					else if (MathEngine.isLarger(gap, Vehicle.vehiclePadding))
-						;
-					this.setVelocityY(-Math.min(Vehicle.maxSpeed, gap - vehiclePadding));
-				}
-			}
-
+			this.setVelocityY(-Vehicle.maxSpeed);
 			break;
 
 		case LEFT_TO_RIGHT:
 			this.setVelocityY(0);
-			if (isLastVehicle) {
-				this.setVelocityX(Vehicle.maxSpeed);
-			} else {
-				double nextVehicleSpeed = nextVehicle.getVelocityX();
-				double gap = (nextVehicle.getX() - nextVehicle.getHeight() / 2) - (this.getX() + this.getHeight() / 2);
-
-				if (MathEngine.isLarger(nextVehicleSpeed, 0)) {
-					if (MathEngine.isEqual(gap, Vehicle.vehiclePadding))
-						this.setVelocityX(nextVehicleSpeed);
-
-					else if (MathEngine.isLarger(gap, Vehicle.vehiclePadding))
-						this.setVelocityX(Vehicle.maxSpeed);
-
-					else
-						this.setVelocityX(0); // Not required as gap >= padding for cases but still used as emergency
-												// brake
-
-				} else if (MathEngine.isSmallerEquals(nextVehicleSpeed, 0)) {
-
-					if (MathEngine.isEqual(gap, Vehicle.vehiclePadding))
-						this.setVelocityX(0);
-
-					else if (MathEngine.isLarger(gap, Vehicle.vehiclePadding))
-						this.setVelocityX(Math.min(Vehicle.maxSpeed, gap - vehiclePadding));
-				}
-			}
-
+			this.setVelocityX(Vehicle.maxSpeed);
 			break;
-
 		case RIGHT_TO_LEFT:
 			this.setVelocityY(0);
-			if (isLastVehicle) {
-				this.setVelocityX(-Vehicle.maxSpeed);
-			} else {
-				double nextVehicleSpeed = nextVehicle.getVelocityX();
-				double gap = (this.getX() - this.getHeight() / 2) - (nextVehicle.getX() + nextVehicle.getHeight() / 2);
-
-				if (MathEngine.isLarger(nextVehicleSpeed, 0)) {
-					if (MathEngine.isEqual(gap, Vehicle.vehiclePadding))
-						this.setVelocityX(nextVehicleSpeed);
-
-					else if (MathEngine.isLarger(gap, Vehicle.vehiclePadding))
-						this.setVelocityX(-Vehicle.maxSpeed);
-
-					else
-						this.setVelocityX(0); // Not required as gap >= padding for cases but still used as emergency
-												// brake
-
-				} else if (MathEngine.isEqual(nextVehicleSpeed, 0)) {
-
-					if (MathEngine.isSmallerEquals(gap, Vehicle.vehiclePadding))
-						this.setVelocityX(0);
-
-					else if (MathEngine.isLarger(gap, Vehicle.vehiclePadding))
-						this.setVelocityX(-Math.min(Vehicle.maxSpeed, gap - vehiclePadding));
-				}
-			}
-
+			this.setVelocityX(-Vehicle.maxSpeed);
 			break;
 
 		default:
@@ -645,21 +463,21 @@ public abstract class Vehicle {
 	 * @returns true if the vehicle left the region of the map which contained it,
 	 *          otherwise false
 	 */
-	public boolean update(Vehicle nextVehicle, boolean isLastVehicle) {
+	public boolean update() {
 
 		boolean leftRegion = false;
 		/** updating velocity **/
 
 		if (inCrossing) {
 
-			crossingVehicleUpdate(nextVehicle);
+			crossingVelocityUpdate();
 		}
 
 		else if (this.currentLane.getClass() == ForwardLane.class) {
-			forwardLaneVehicleUpdate(nextVehicle, isLastVehicle);
+			forwardLaneVelocityUpdate();
 		} else if (this.currentLane.getClass() == BackwardLane.class) {
 
-			backwardLaneVehicleUpdate(nextVehicle, isLastVehicle);
+			backwardLaneVelocityUpdate();
 		}
 
 		collisionUpdate();
@@ -668,6 +486,7 @@ public abstract class Vehicle {
 
 		this.getRegion().setX(this.getX() + this.velocityX);
 		this.getRegion().setY(this.getY() + this.velocityY);
+
 		if (!this.inCrossing
 				&& (this.getDirection() == Direction.TOP_TO_BOTTOM || this.getDirection() == Direction.BOTTOM_TO_TOP)) {
 			this.getRegion().setX(this.currentLane.getX());
@@ -680,7 +499,7 @@ public abstract class Vehicle {
 
 		/** update consequences **/
 
-		leftRegion = updateVariables(isLastVehicle);
+		leftRegion = updateVariables();
 
 		return leftRegion;
 	}
@@ -779,7 +598,7 @@ public abstract class Vehicle {
 
 	}
 
-	private boolean updateVariables(boolean isLastVehicle) {
+	private boolean updateVariables() {
 		boolean leftRegion = false;
 		if (inCrossing) {
 
@@ -923,7 +742,7 @@ public abstract class Vehicle {
 			}
 		}
 
-		else if (this.currentRoad.equals(this.sourceRoad) && isLastVehicle) {
+		else if (this.currentRoad.equals(this.sourceRoad)) {
 
 			switch (this.direction) {
 
@@ -967,7 +786,7 @@ public abstract class Vehicle {
 
 		}
 
-		else if (this.currentRoad.equals(this.destinationRoad) && isLastVehicle) {
+		else if (this.currentRoad.equals(this.destinationRoad)) {
 			switch (this.direction) {
 
 			case TOP_TO_BOTTOM: {
@@ -1013,11 +832,12 @@ public abstract class Vehicle {
 		this.currentRoad = null;
 	}
 
-	private void crossingVehicleUpdate(Vehicle nextVehicle) {
+	private void crossingVelocityUpdate() {
 
-		double angle = Vehicle.getAngle(this.sourceRoad.getType().getIndex(),
+		double angle = Vehicle.getAngle(this.sourceRoad.getType().getIndex(), // get angle to be rotated to reach its
+																				// destination
 				this.destinationRoad.getType().getIndex());
-		boolean isDirectionChange = !MathEngine.isEqual(angle, 0);
+		boolean isDirectionChange = !MathEngine.isEqual(angle, 0); // vehicle will turn or go straight
 
 		switch (this.direction) {
 
@@ -1039,13 +859,13 @@ public abstract class Vehicle {
 								+ directionSign * this.getHeight() / 2) - (this.sourceLane.getX()));
 
 				double tempAngle = Math.atan((maxYGap - yGap) * maxXGap / (xGap) / maxYGap);
-				this.setAngle(-directionSign * Math.toRadians(Math.abs(angle))
+				this.setAngle(-directionSign * Math.toRadians(Math.abs(angle)) // angle to be rotated for rendering
 						* MathEngine.getDistance(maxXGap - xGap, maxYGap - yGap)
 						/ MathEngine.getDistance(maxXGap, maxYGap));
 
-				double xSpeed = Vehicle.crossingMaxSpeed * maxXGap / (MathEngine.getDistance(maxXGap, maxYGap))
+				double xSpeed = Vehicle.maxCrossingSpeed * maxXGap / (MathEngine.getDistance(maxXGap, maxYGap))
 						* Math.sin(tempAngle);
-				double ySpeed = Vehicle.crossingMaxSpeed * maxYGap / (MathEngine.getDistance(maxXGap, maxYGap))
+				double ySpeed = Vehicle.maxCrossingSpeed * maxYGap / (MathEngine.getDistance(maxXGap, maxYGap))
 						* Math.cos(tempAngle);
 
 				if (MathEngine.isLarger(yGap, ySpeed))
@@ -1064,8 +884,9 @@ public abstract class Vehicle {
 			else {
 				double straightAngle = this.getCurrentCrossingTurnAngle();
 				this.setAngle(-straightAngle);
-				this.setVelocityX(Vehicle.crossingMaxSpeed * Math.sin(straightAngle));
-				this.setVelocityY(Vehicle.crossingMaxSpeed * Math.cos(straightAngle));
+				this.setVelocityX(Vehicle.maxCrossingSpeed * Math.sin(straightAngle));
+				this.setVelocityY(Vehicle.maxCrossingSpeed * Math.cos(straightAngle));
+
 			}
 			break;
 		}
@@ -1092,9 +913,9 @@ public abstract class Vehicle {
 						* MathEngine.getDistance(maxXGap - xGap, maxYGap - yGap)
 						/ MathEngine.getDistance(maxXGap, maxYGap));
 
-				double xSpeed = Vehicle.crossingMaxSpeed * maxXGap / (MathEngine.getDistance(maxXGap, maxYGap))
+				double xSpeed = Vehicle.maxCrossingSpeed * maxXGap / (MathEngine.getDistance(maxXGap, maxYGap))
 						* Math.sin(tempAngle);
-				double ySpeed = Vehicle.crossingMaxSpeed * maxYGap / (MathEngine.getDistance(maxXGap, maxYGap))
+				double ySpeed = Vehicle.maxCrossingSpeed * maxYGap / (MathEngine.getDistance(maxXGap, maxYGap))
 						* Math.cos(tempAngle);
 
 				if (MathEngine.isLarger(yGap, ySpeed))
@@ -1109,8 +930,8 @@ public abstract class Vehicle {
 			else {
 				double straightAngle = this.getCurrentCrossingTurnAngle();
 				this.setAngle(straightAngle);
-				this.setVelocityX(Vehicle.crossingMaxSpeed * Math.sin(straightAngle));
-				this.setVelocityY(-Vehicle.crossingMaxSpeed * Math.cos(straightAngle));
+				this.setVelocityX(Vehicle.maxCrossingSpeed * Math.sin(straightAngle));
+				this.setVelocityY(-Vehicle.maxCrossingSpeed * Math.cos(straightAngle));
 			}
 			break;
 		}
@@ -1136,9 +957,9 @@ public abstract class Vehicle {
 						* MathEngine.getDistance(maxXGap - xGap, maxYGap - yGap)
 						/ MathEngine.getDistance(maxXGap, maxYGap));
 
-				double xSpeed = Vehicle.crossingMaxSpeed * maxXGap / (MathEngine.getDistance(maxYGap, maxXGap))
+				double xSpeed = Vehicle.maxCrossingSpeed * maxXGap / (MathEngine.getDistance(maxYGap, maxXGap))
 						* Math.cos(tempAngle);
-				double ySpeed = Vehicle.crossingMaxSpeed * maxYGap / (MathEngine.getDistance(maxYGap, maxXGap))
+				double ySpeed = Vehicle.maxCrossingSpeed * maxYGap / (MathEngine.getDistance(maxYGap, maxXGap))
 						* Math.sin(tempAngle);
 
 				if (MathEngine.isLarger(xGap, xSpeed))
@@ -1156,8 +977,8 @@ public abstract class Vehicle {
 			else {
 				double straightAngle = this.getCurrentCrossingTurnAngle();
 				this.setAngle(straightAngle);
-				this.setVelocityX(Vehicle.crossingMaxSpeed * Math.cos(straightAngle));
-				this.setVelocityY(Vehicle.crossingMaxSpeed * Math.sin(straightAngle));
+				this.setVelocityX(Vehicle.maxCrossingSpeed * Math.cos(straightAngle));
+				this.setVelocityY(Vehicle.maxCrossingSpeed * Math.sin(straightAngle));
 			}
 			break;
 		}
@@ -1184,9 +1005,9 @@ public abstract class Vehicle {
 						* MathEngine.getDistance(maxXGap - xGap, maxYGap - yGap)
 						/ MathEngine.getDistance(maxXGap, maxYGap));
 
-				double xSpeed = Vehicle.crossingMaxSpeed * maxXGap / (MathEngine.getDistance(maxYGap, maxXGap))
+				double xSpeed = Vehicle.maxCrossingSpeed * maxXGap / (MathEngine.getDistance(maxYGap, maxXGap))
 						* Math.cos(tempAngle);
-				double ySpeed = Vehicle.crossingMaxSpeed * maxYGap / (MathEngine.getDistance(maxYGap, maxXGap))
+				double ySpeed = Vehicle.maxCrossingSpeed * maxYGap / (MathEngine.getDistance(maxYGap, maxXGap))
 						* Math.sin(tempAngle);
 
 				if (MathEngine.isLarger(xGap, xSpeed))
@@ -1204,14 +1025,13 @@ public abstract class Vehicle {
 			else {
 				double straightAngle = this.getCurrentCrossingTurnAngle();
 				this.setAngle(-straightAngle);
-				this.setVelocityX(-Vehicle.crossingMaxSpeed * Math.cos(straightAngle));
-				this.setVelocityY(Vehicle.crossingMaxSpeed * Math.sin(straightAngle));
+				this.setVelocityX(-Vehicle.maxCrossingSpeed * Math.cos(straightAngle));
+				this.setVelocityY(Vehicle.maxCrossingSpeed * Math.sin(straightAngle));
 			}
 			break;
 		}
 
 		}
-
 	}
 
 	private void setToDestination() {

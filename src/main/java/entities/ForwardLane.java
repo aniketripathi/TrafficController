@@ -1,5 +1,8 @@
 package main.java.entities;
 
+import java.util.LinkedList;
+import java.util.ListIterator;
+
 import javafx.geometry.Point2D;
 import javafx.scene.shape.Line;
 import main.java.util.MathEngine;
@@ -9,27 +12,63 @@ public class ForwardLane extends Lane {
 	/**
 	 * The line coordinates where this lane ends
 	 */
-	private Line exitBarrier;
 
 	private Point2D carSpawnPoint;
 	private Point2D twoWheelerSpawnPoint;
 	private Point2D heavyVehicleSpawnPoint;
 
+	private LinkedList<Vehicle> bufferQueue;
+
+	private final int BUFFER_LIMIT = 200;
+
 	public ForwardLane(Road road, int index) {
 		super(road, index);
-		exitBarrier = new Line();
 		carSpawnPoint = new Point2D(0, 0);
 		twoWheelerSpawnPoint = new Point2D(0, 0);
 		heavyVehicleSpawnPoint = new Point2D(0, 0);
-
+		bufferQueue = new LinkedList<Vehicle>();
 	}
 
-	public Line getExitBarrier() {
-		return exitBarrier;
+	@Override
+	public boolean addVehicle(Vehicle vehicle) {
+		boolean added = false;
+		if (this.isEnoughSpace(vehicle)) {
+			added = super.addVehicle(vehicle);
+		} else if (bufferQueue.size() <= BUFFER_LIMIT) {
+			bufferQueue.addLast(vehicle);
+			added = true;
+		}
+
+		return added;
 	}
 
-	public void setExitBarrier(Line exitBarrier) {
-		this.exitBarrier = exitBarrier;
+	public void updateQueues() {
+		ListIterator<Vehicle> iterator = bufferQueue.listIterator();
+		while (iterator.hasNext()) {
+			Vehicle vehicle = iterator.next();
+			if (this.isEnoughSpace(vehicle)) {
+				super.addVehicle(vehicle);
+				iterator.remove();
+			} else {
+				break;
+			}
+		}
+	}
+
+	@Override
+	public void clearQueue() {
+
+		super.clearQueue();
+		bufferQueue.clear();
+	}
+
+	@Override
+	public boolean isEmpty() {
+		return super.isEmpty() && bufferQueue.isEmpty();
+	}
+
+	public int getQueueSize() {
+		return super.getQueueSize() + bufferQueue.size();
 	}
 
 	public Point2D getCarSpawnPoint() {

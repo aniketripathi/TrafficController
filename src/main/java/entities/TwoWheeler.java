@@ -73,13 +73,13 @@ public class TwoWheeler extends Vehicle {
 	public void computeRegions() {
 		if (this.getDirection() == Vehicle.Direction.TOP_TO_BOTTOM
 				|| this.getDirection() == Vehicle.Direction.BOTTOM_TO_TOP) {
-			this.getRegion().setHeight(Scale.TWO_WHEELER_LENGTH_METERS * Scale.pixelToMeterRatio);
-			this.getRegion().setWidth(Scale.TWO_WHEELER_WIDTH_METERS * Scale.pixelToMeterRatio);
+			this.getRegion().setHeight(Scale.toPixels(Scale.TWO_WHEELER_LENGTH_METERS));
+			this.getRegion().setWidth(Scale.toPixels(Scale.TWO_WHEELER_WIDTH_METERS));
 		}
 
 		else {
-			this.getRegion().setWidth(Scale.TWO_WHEELER_LENGTH_METERS * Scale.pixelToMeterRatio);
-			this.getRegion().setHeight(Scale.TWO_WHEELER_WIDTH_METERS * Scale.pixelToMeterRatio);
+			this.getRegion().setWidth(Scale.toPixels(Scale.TWO_WHEELER_LENGTH_METERS));
+			this.getRegion().setHeight(Scale.toPixels(Scale.TWO_WHEELER_WIDTH_METERS));
 
 		}
 

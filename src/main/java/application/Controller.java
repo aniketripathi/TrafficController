@@ -95,6 +95,14 @@ public class Controller implements Initializable, ChangeListener<Number> {
 	private Label crossedValueLabel;
 	@FXML
 	private MenuItem setConfigMenuItem;
+	@FXML
+	private Label greenTimeValueLabel;
+	@FXML
+	private Label fpsValueLabel;
+	@FXML
+	private Label AQLValueLabel;
+	@FXML
+	private Label AWTValueLabel;
 
 	private Stage parentStage;
 	private Map map;
@@ -114,8 +122,8 @@ public class Controller implements Initializable, ChangeListener<Number> {
 		// canvas.setWidth(root.getWidth());
 		// canvas.setHeight(root.getHeight());
 
-		double laneWidth = Scale.LANE_WIDTH_METERS * Scale.pixelToMeterRatio;
-		double dividerWidth = Scale.DIVIDER_WIDTH_METERS * Scale.pixelToMeterRatio;
+		double laneWidth = Scale.toPixels(Scale.LANE_WIDTH_METERS);
+		double dividerWidth = Scale.toPixels(Scale.DIVIDER_WIDTH_METERS);
 		double crossingWidth = (laneWidth * 6 + dividerWidth) * 1.7;
 		double trafficLightWidth = dividerWidth;
 		map = new Map(canvas.getWidth(), canvas.getHeight(), laneWidth, dividerWidth, trafficLightWidth, crossingWidth,
@@ -127,7 +135,7 @@ public class Controller implements Initializable, ChangeListener<Number> {
 		config = new Config(map.getNumberOfLanes());
 		recorder = new Recorder(map.getNumberOfLanes());
 		updater = new Updater(map, canvas, vehicleManager, config, recorder, timerValueLabel, generatedValueLabel,
-				crossedValueLabel);
+				crossedValueLabel, fpsValueLabel, greenTimeValueLabel, AQLValueLabel, AWTValueLabel);
 		sim = new Simulator(updater);
 		fileChooser = new FileChooser();
 		fileChooser.getExtensionFilters().add(new ExtensionFilter("Text Files", "*.txt"));
@@ -137,8 +145,6 @@ public class Controller implements Initializable, ChangeListener<Number> {
 		stopButton.setOnAction(evt -> sim.stop());
 		halfSpeedButton.setOnAction(evt -> sim.halfSpeed());
 		doubleSpeedButton.setOnAction(evt -> sim.doubleSpeed());
-		map.getRoad(2).getTrafficLight().setColor(LightColor.GREEN);
-		// map.getRoad(1).getTrafficLight().setColor(LightColor.GREEN);
 
 	}
 

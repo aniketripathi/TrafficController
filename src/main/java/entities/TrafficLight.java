@@ -28,15 +28,11 @@ public class TrafficLight {
 	public static final LightColor DEFAULT_COLOR = LightColor.RED;
 
 	public TrafficLight(boolean enabled) {
-		this.enabled = enabled;
-		this.timer = 0;
-		this.color = DEFAULT_COLOR;
-		this.region = new Region();
-		event = () -> this.setColor(LightColor.RED);
+		this(new Region(), enabled);
 	}
 
 	public TrafficLight() {
-		this(false);
+		this(true);
 	}
 
 	public TrafficLight(Region region, boolean enabled) {
@@ -48,6 +44,10 @@ public class TrafficLight {
 
 	public CountdownTimerEvent getCountdownTimerEvent() {
 		return this.event;
+	}
+
+	public void setCountdownTimerEvent(CountdownTimerEvent event) {
+		this.event = event;
 	}
 
 	public double getTimer() {

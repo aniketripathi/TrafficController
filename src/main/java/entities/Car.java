@@ -76,13 +76,13 @@ public class Car extends Vehicle {
 
 		if (this.getDirection() == Vehicle.Direction.TOP_TO_BOTTOM
 				|| this.getDirection() == Vehicle.Direction.BOTTOM_TO_TOP) {
-			this.getRegion().setHeight(Scale.CAR_LENGTH_METERS * Scale.pixelToMeterRatio);
-			this.getRegion().setWidth(Scale.CAR_WIDTH_METERS * Scale.pixelToMeterRatio);
+			this.getRegion().setHeight(Scale.toPixels(Scale.CAR_LENGTH_METERS));
+			this.getRegion().setWidth(Scale.toPixels(Scale.CAR_WIDTH_METERS));
 		}
 
 		else {
-			this.getRegion().setWidth(Scale.CAR_LENGTH_METERS * Scale.pixelToMeterRatio);
-			this.getRegion().setHeight(Scale.CAR_WIDTH_METERS * Scale.pixelToMeterRatio);
+			this.getRegion().setWidth(Scale.toPixels(Scale.CAR_LENGTH_METERS));
+			this.getRegion().setHeight(Scale.toPixels(Scale.CAR_WIDTH_METERS));
 
 		}
 

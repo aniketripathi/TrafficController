@@ -165,7 +165,9 @@ public class Timer {
 	 *         created or reset().
 	 */
 	public long getFromStartNanos() {
+		// System.out.println(this.getInitialTime());
 		return (System.nanoTime() - getInitialTime());
+
 	}
 
 	private synchronized void setRate(float rate) {
@@ -188,7 +190,7 @@ public class Timer {
 		return this.initialTime;
 	}
 
-	private synchronized void setInitialTime(long initalTime) {
+	private synchronized void setInitialTime(long initialTime) {
 		this.initialTime = initialTime;
 	}
 

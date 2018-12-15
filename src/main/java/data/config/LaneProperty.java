@@ -1,38 +1,38 @@
 package main.java.data.config;
 
-import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.FloatProperty;
+import javafx.beans.property.SimpleFloatProperty;
 import main.java.exceptions.ProbabilityException;
 import main.java.util.MathEngine;
 
 public class LaneProperty {
 
-	private DoubleProperty carProbability;
-	private DoubleProperty twoWheelerProbability;
-	private DoubleProperty heavyVehicleProbability;
-	private DoubleProperty rate;
+	private FloatProperty carProbability;
+	private FloatProperty twoWheelerProbability;
+	private FloatProperty heavyVehicleProbability;
+	private FloatProperty rate;
 
-	public static final double DEFAULT_CAR_PROBABILITY = 0.5;
-	public static final double DEFAULT_TWO_WHEELER_PROBABILITY = 0.4;
-	public static final double DEFAULT_HEAVY_VEHICLE_PROBABILITY = 0.1;
-	public static final double DEFAULT_RATE = 0.2;
+	public static final float DEFAULT_CAR_PROBABILITY = 0.8f;
+	public static final float DEFAULT_TWO_WHEELER_PROBABILITY = 0.15f;
+	public static final float DEFAULT_HEAVY_VEHICLE_PROBABILITY = 0.05f;
+	public static final float DEFAULT_RATE = 1.8f;
 
 	public LaneProperty() {
 
-		carProbability = new SimpleDoubleProperty(DEFAULT_CAR_PROBABILITY);
-		twoWheelerProbability = new SimpleDoubleProperty(DEFAULT_TWO_WHEELER_PROBABILITY);
-		heavyVehicleProbability = new SimpleDoubleProperty(DEFAULT_HEAVY_VEHICLE_PROBABILITY);
-		rate = new SimpleDoubleProperty(DEFAULT_RATE);
+		carProbability = new SimpleFloatProperty(DEFAULT_CAR_PROBABILITY);
+		twoWheelerProbability = new SimpleFloatProperty(DEFAULT_TWO_WHEELER_PROBABILITY);
+		heavyVehicleProbability = new SimpleFloatProperty(DEFAULT_HEAVY_VEHICLE_PROBABILITY);
+		rate = new SimpleFloatProperty(DEFAULT_RATE);
 	}
 
 	public LaneProperty(LaneProperty laneProperty) {
-		carProbability = new SimpleDoubleProperty(laneProperty.getCarProbability());
-		twoWheelerProbability = new SimpleDoubleProperty(laneProperty.getTwoWheelerProbability());
-		heavyVehicleProbability = new SimpleDoubleProperty(laneProperty.getHeavyVehicleProbability());
-		rate = new SimpleDoubleProperty(laneProperty.getRate());
+		carProbability = new SimpleFloatProperty(laneProperty.getCarProbability());
+		twoWheelerProbability = new SimpleFloatProperty(laneProperty.getTwoWheelerProbability());
+		heavyVehicleProbability = new SimpleFloatProperty(laneProperty.getHeavyVehicleProbability());
+		rate = new SimpleFloatProperty(laneProperty.getRate());
 	}
 
-	private static boolean probabilityValidate(double value) {
+	private static boolean probabilityValidate(float value) {
 		return MathEngine.inRange(value, 0, 1);
 	}
 
@@ -51,51 +51,51 @@ public class LaneProperty {
 		setRate(DEFAULT_RATE);
 	}
 
-	public double getCarProbability() {
+	public float getCarProbability() {
 		return carProbability.get();
 	}
 
-	public void setCarProbability(double carProbability) {
+	public void setCarProbability(float carProbability) {
 		this.carProbability.set(carProbability);
 	}
 
-	public double getTwoWheelerProbability() {
+	public float getTwoWheelerProbability() {
 		return twoWheelerProbability.get();
 	}
 
-	public void setTwoWheelerProbability(double twoWheelerProbability) {
+	public void setTwoWheelerProbability(float twoWheelerProbability) {
 		this.twoWheelerProbability.set(twoWheelerProbability);
 	}
 
-	public double getHeavyVehicleProbability() {
+	public float getHeavyVehicleProbability() {
 		return heavyVehicleProbability.get();
 	}
 
-	public void setHeavyVehicleProbability(double heavyVehicleProbability) {
+	public void setHeavyVehicleProbability(float heavyVehicleProbability) {
 		this.heavyVehicleProbability.set(heavyVehicleProbability);
 	}
 
-	public double getRate() {
+	public float getRate() {
 		return rate.get();
 	}
 
-	public void setRate(double rate) {
+	public void setRate(float rate) {
 		this.rate.set(rate);
 	}
 
-	public DoubleProperty getCarProbabilityProperty() {
+	public FloatProperty getCarProbabilityProperty() {
 		return carProbability;
 	}
 
-	public DoubleProperty getTwoWheelerProbabilityProperty() {
+	public FloatProperty getTwoWheelerProbabilityProperty() {
 		return twoWheelerProbability;
 	}
 
-	public DoubleProperty getHeavyVehicleProbabilityProperty() {
+	public FloatProperty getHeavyVehicleProbabilityProperty() {
 		return heavyVehicleProbability;
 	}
 
-	public DoubleProperty getRateProbabilityProperty() {
+	public FloatProperty getRateProbabilityProperty() {
 		return rate;
 	}
 

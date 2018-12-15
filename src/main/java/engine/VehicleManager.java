@@ -57,6 +57,7 @@ public class VehicleManager {
 			car.getRegion().setX(sourceLane.getCarSpawnPoint().getX());
 			car.getRegion().setY(sourceLane.getCarSpawnPoint().getY());
 			car.updateDirection();
+			car.computeRegions();
 		}
 
 		return car;
@@ -82,6 +83,7 @@ public class VehicleManager {
 			twoWheeler.getRegion().setX(sourceLane.getTwoWheelerSpawnPoint().getX());
 			twoWheeler.getRegion().setY(sourceLane.getTwoWheelerSpawnPoint().getY());
 			twoWheeler.updateDirection();
+			twoWheeler.computeRegions();
 		}
 
 		return twoWheeler;
@@ -107,6 +109,7 @@ public class VehicleManager {
 			heavyVehicle.getRegion().setX(sourceLane.getHeavyVehicleSpawnPoint().getX());
 			heavyVehicle.getRegion().setY(sourceLane.getHeavyVehicleSpawnPoint().getY());
 			heavyVehicle.updateDirection();
+			heavyVehicle.computeRegions();
 		}
 
 		return heavyVehicle;

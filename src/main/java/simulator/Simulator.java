@@ -5,8 +5,8 @@ import main.java.engine.Updater;
 
 public class Simulator {
 
-	public static double FPS = 30;
 	private Updater updater;
+	public static final float EXPECTED_FPS = 60;
 
 	private class AnimationController extends AnimationTimer {
 
@@ -17,10 +17,11 @@ public class Simulator {
 		private boolean arrayFilled = false;
 		private long elapsedFrameNanos;
 		private int rate = Simulator.NORMAL_RATE;
+		private float frameRate;
 
 		public AnimationController(Updater updater) {
 			this.updater = updater;
-
+			this.frameRate = EXPECTED_FPS;
 		}
 
 		public void setRate(int rate) {
@@ -44,18 +45,22 @@ public class Simulator {
 			if (arrayFilled) {
 				long elapsedNanos = now - oldFrameTime;
 				long elapsedNanosPerFrame = elapsedNanos / frameTimes.length;
-
+				frameRate = 1_000_000_000F / elapsedNanosPerFrame;
 				if (elapsedNanosPerFrame * rate < elapsedFrameNanos) {
 
 					updater.update();
 					updater.draw();
+					updater.setFrameRate(this.getFrameRate());
 					prev = now;
 				}
+
 				elapsedFrameNanos = now - prev;
-				// double frameRate = 1_000_000_000/elapsedNanosPerFrame
-				// double updateRate = 1_000_000_000/elapsedFrameNanos
 			}
 
+		}
+
+		public float getFrameRate() {
+			return this.frameRate;
 		}
 	}
 
@@ -99,4 +104,7 @@ public class Simulator {
 		updater.halfRate();
 	}
 
+	public void getFrameRate() {
+		animationController.getFrameRate();
+	}
 }

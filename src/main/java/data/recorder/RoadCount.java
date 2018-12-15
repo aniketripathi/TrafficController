@@ -29,7 +29,7 @@ public class RoadCount implements ChangeListener<Number> {
 				totalGenerated.set(totalGenerated.get() - oldVal.longValue() + newVal.longValue());
 			});
 			backwardLanesCount[i].getDestroyedCount().getTotalProperty().addListener((obs, oldVal, newVal) -> {
-				totalGenerated.set(totalDestroyed.get() - oldVal.longValue() + newVal.longValue());
+				totalDestroyed.set(totalDestroyed.get() - oldVal.longValue() + newVal.longValue());
 			});
 		}
 		totalGenerated.addListener(this);

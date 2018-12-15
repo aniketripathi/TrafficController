@@ -67,14 +67,20 @@
 												<Separator id="toolBarSeparator" fx:id="toolBarSeparator" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" orientation="VERTICAL" />
 												<HBox id="timerHBox" fx:id="timerHBox" alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" spacing="10.0">
 													<children>
-														<Label id="timerLabel" fx:id="timerLabel" alignment="TOP_LEFT" maxWidth="1.7976931348623157E308" text="TIME">
+														<Label id="timerLabel" fx:id="timerLabel" alignment="TOP_LEFT" maxWidth="1.7976931348623157E308" text="Time">
 															<rotationAxis>
 																<Point3D />
 															</rotationAxis>
 														</Label>
-														<Label id="timerValueLabel" fx:id="timerValueLabel" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="30" />
+														<Label id="timerValueLabel" fx:id="timerValueLabel" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="0" />
 													</children>
 												</HBox>
+                                    <HBox alignment="CENTER" spacing="10.0">
+                                       <children>
+                                          <Label fx:id="greenTimeLabel" text="Green Time" />
+                                          <Label fx:id="greenTimeValueLabel" text="0" />
+                                       </children>
+                                    </HBox>
 												<HBox id="generatedHBox" fx:id="generatedHBox" alignment="CENTER" spacing="10.0">
 													<children>
 														<Label id="generatedLabel" fx:id="generatedLabel" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="Generated" />
@@ -87,6 +93,24 @@
 														<Label id="crossedValueLabel" fx:id="crossedValueLabel" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="0" />
 													</children>
 												</HBox>
+                                    <HBox alignment="CENTER" spacing="10.0">
+                                       <children>
+                                          <Label fx:id="fpsLabel" text="FPS" />
+                                          <Label fx:id="fpsValueLabel" text="60" />
+                                       </children>
+                                    </HBox>
+                                    <HBox alignment="CENTER" spacing="10.0">
+                                       <children>
+                                          <Label text="AQL" />
+                                          <Label fx:id="AQLValueLabel" text="0" />
+                                       </children>
+                                    </HBox>
+                                    <HBox alignment="CENTER" spacing="10.0">
+                                       <children>
+                                          <Label text="AWT" />
+                                          <Label fx:id="AWTValueLabel" text="0" />
+                                       </children>
+                                    </HBox>
 											</children>
 										</HBox>
 									</items>

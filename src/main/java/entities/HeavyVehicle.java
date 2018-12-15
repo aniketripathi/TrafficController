@@ -13,9 +13,9 @@ public class HeavyVehicle extends Vehicle {
 	private static final String IMAGE_TOP_TO_BOTTOM_URL = "/main/resources/images/heavy_vehicle_top_to_bottom.png";
 
 	public static DoubleProperty imageWidth = new SimpleDoubleProperty(
-			Scale.HEAVY_VEHICLE_LENGTH_METERS * Scale.pixelToMeterRatio);
+			Scale.toPixels(Scale.HEAVY_VEHICLE_LENGTH_METERS));
 	public static DoubleProperty imageHeight = new SimpleDoubleProperty(
-			Scale.HEAVY_VEHICLE_WIDTH_METERS * Scale.pixelToMeterRatio);
+			Scale.toPixels(Scale.HEAVY_VEHICLE_WIDTH_METERS));
 
 	private Image image_top_to_bottom = new Image(IMAGE_TOP_TO_BOTTOM_URL, HeavyVehicle.getImageWidth(),
 			HeavyVehicle.getImageHeight(), false, true);
@@ -84,13 +84,13 @@ public class HeavyVehicle extends Vehicle {
 
 		if (this.getDirection() == Vehicle.Direction.TOP_TO_BOTTOM
 				|| this.getDirection() == Vehicle.Direction.BOTTOM_TO_TOP) {
-			this.getRegion().setHeight(Scale.HEAVY_VEHICLE_LENGTH_METERS * Scale.pixelToMeterRatio);
-			this.getRegion().setWidth(Scale.HEAVY_VEHICLE_WIDTH_METERS * Scale.pixelToMeterRatio);
+			this.getRegion().setHeight(Scale.toPixels(Scale.HEAVY_VEHICLE_LENGTH_METERS));
+			this.getRegion().setWidth(Scale.toPixels(Scale.HEAVY_VEHICLE_WIDTH_METERS));
 		}
 
 		else {
-			this.getRegion().setWidth(Scale.HEAVY_VEHICLE_LENGTH_METERS * Scale.pixelToMeterRatio);
-			this.getRegion().setHeight(Scale.HEAVY_VEHICLE_WIDTH_METERS * Scale.pixelToMeterRatio);
+			this.getRegion().setWidth(Scale.toPixels(Scale.HEAVY_VEHICLE_LENGTH_METERS));
+			this.getRegion().setHeight(Scale.toPixels(Scale.HEAVY_VEHICLE_WIDTH_METERS));
 
 		}
 

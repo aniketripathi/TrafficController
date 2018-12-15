@@ -5,7 +5,6 @@ import java.util.ListIterator;
 import java.util.NoSuchElementException;
 
 import javafx.scene.canvas.GraphicsContext;
-import main.java.util.Path;
 import main.java.util.Region;
 
 public abstract class Lane {
@@ -16,9 +15,6 @@ public abstract class Lane {
 
 	private Road road;
 	private double laneLength;
-	private Path carPath;
-	private Path twoWheelerPath;
-	private Path heavyVehiclePath;
 	private int index;
 
 	/**
@@ -37,7 +33,6 @@ public abstract class Lane {
 		this.laneLength = 0;
 		this.laneLength = 0;
 		queue = new LinkedList<Vehicle>();
-
 	}
 
 	public int getIndex() {
@@ -92,38 +87,14 @@ public abstract class Lane {
 		this.laneLength = laneLength;
 	}
 
-	public Path getCarPath() {
-		return carPath;
-	}
-
-	public void setCarPath(Path carPath) {
-		this.carPath = carPath;
-	}
-
-	public Path getTwoWheelerPath() {
-		return twoWheelerPath;
-	}
-
-	public void setTwoWheelerPath(Path twoWheelerPath) {
-		this.twoWheelerPath = twoWheelerPath;
-	}
-
-	public Path getHeavyVehiclePath() {
-		return heavyVehiclePath;
-
-	}
-
-	public void setHeavyVehiclePath(Path heavyVehiclePath) {
-		this.heavyVehiclePath = heavyVehiclePath;
-	}
-
 	protected LinkedList<Vehicle> getQueue() {
 		return this.queue;
 	}
 
 	/** Vehicle will be added to the end of the list **/
-	public void addVehicle(Vehicle vehicle) {
+	public boolean addVehicle(Vehicle vehicle) {
 		queue.addLast(vehicle);
+		return true;
 	}
 
 	public void removeVehicle(Vehicle vehicle) {

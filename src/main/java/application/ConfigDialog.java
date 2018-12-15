@@ -56,7 +56,7 @@ public class ConfigDialog implements Initializable {
 			else if (newval.matches("\\d*(\\.\\d+)?")) {
 				int road = roadSelectComboBox.getValue().getIndex();
 				int lane = laneSelectComboBox.getValue();
-				config.getRoadProperty(road).getLaneProperty(lane).setTwoWheelerProbability(Double.parseDouble(newval));
+				config.getRoadProperty(road).getLaneProperty(lane).setTwoWheelerProbability(Float.parseFloat(newval));
 			}
 
 		});
@@ -66,7 +66,7 @@ public class ConfigDialog implements Initializable {
 			else if (newval.matches("\\d*(\\.\\d+)?")) {
 				int road = roadSelectComboBox.getValue().getIndex();
 				int lane = laneSelectComboBox.getValue();
-				config.getRoadProperty(road).getLaneProperty(lane).setCarProbability(Double.parseDouble(newval));
+				config.getRoadProperty(road).getLaneProperty(lane).setCarProbability(Float.parseFloat(newval));
 			}
 		});
 		heavyVehicleProbability.textProperty().addListener((obs, oldval, newval) -> {
@@ -75,8 +75,7 @@ public class ConfigDialog implements Initializable {
 			else if (newval.matches("\\d*(\\.\\d+)?")) {
 				int road = roadSelectComboBox.getValue().getIndex();
 				int lane = laneSelectComboBox.getValue();
-				config.getRoadProperty(road).getLaneProperty(lane)
-						.setHeavyVehicleProbability(Double.parseDouble(newval));
+				config.getRoadProperty(road).getLaneProperty(lane).setHeavyVehicleProbability(Float.parseFloat(newval));
 			}
 		});
 		rate.textProperty().addListener((obs, oldval, newval) -> {
@@ -85,7 +84,7 @@ public class ConfigDialog implements Initializable {
 			else if (newval.matches("\\d*(\\.\\d+)?")) {
 				int road = roadSelectComboBox.getValue().getIndex();
 				int lane = laneSelectComboBox.getValue();
-				config.getRoadProperty(road).getLaneProperty(lane).setRate(Double.parseDouble(newval));
+				config.getRoadProperty(road).getLaneProperty(lane).setRate(Float.parseFloat(newval));
 			}
 		});
 
