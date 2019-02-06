@@ -33,15 +33,10 @@
 												<MenuItem id="exitMenuItem" fx:id="exitMenuItem" mnemonicParsing="false" text="Exit" />
 											</items>
 										</Menu>
-										<Menu id="configMenu" fx:id="configMenu" mnemonicParsing="false" text="Config">
-											<items>
-												<MenuItem id="setConfigMenuItem" fx:id="setConfigMenuItem" mnemonicParsing="false" onAction="#openConfigDialog" text="Set Config" />
-												<MenuItem id="resetConfigMenuItem" fx:id="resetConfigMenuItem" mnemonicParsing="false" text="Reset Config" />
-											</items>
-										</Menu>
 										<Menu id="optionsMenu" fx:id="optionsMenu" mnemonicParsing="false" text="Options">
 											<items>
-												<MenuItem id="preferencesMenuItem" fx:id="preferencesMenuItem" mnemonicParsing="false" text="preferences" />
+												<MenuItem id="setConfigMenuItem" fx:id="setConfigMenuItem" mnemonicParsing="false" onAction="#openConfigDialog" text="Set Config" />
+												<MenuItem id="preferencesMenuItem" fx:id="preferencesMenuItem" mnemonicParsing="false" onAction="#openOptionsDialog" text="Settings" />
 											</items>
 										</Menu>
 										<Menu id="helpMenu" fx:id="helpMenu" mnemonicParsing="false" text="Help">
@@ -62,6 +57,7 @@
 														<Button fx:id="pauseButton" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="pause" />
 														<Button fx:id="stopButton" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="stop" />
 														<Button fx:id="doubleSpeedButton" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="2.0" />
+                                          <Button fx:id="resetButton" mnemonicParsing="false" text="Reset" />
 													</buttons>
 												</ButtonBar>
 												<Separator id="toolBarSeparator" fx:id="toolBarSeparator" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" orientation="VERTICAL" />
@@ -93,6 +89,12 @@
 														<Label id="crossedValueLabel" fx:id="crossedValueLabel" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="0" />
 													</children>
 												</HBox>
+                                    <HBox alignment="CENTER" spacing="10.0">
+                                       <children>
+                                          <Label text="Crossing Rate" />
+                                          <Label fx:id="crossingRateValueLabel" text="0" />
+                                       </children>
+                                    </HBox>
                                     <HBox alignment="CENTER" spacing="10.0">
                                        <children>
                                           <Label fx:id="fpsLabel" text="FPS" />

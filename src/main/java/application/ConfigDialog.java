@@ -7,7 +7,6 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.DialogPane;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
 import main.java.data.config.Config;
@@ -40,7 +39,6 @@ public class ConfigDialog implements Initializable {
 
 	private Config oldConfig;
 	private Config config;
-	private int numberOfLanes;
 
 	@Override
 	public void initialize(URL arg0, ResourceBundle arg1) {
@@ -105,7 +103,6 @@ public class ConfigDialog implements Initializable {
 	}
 
 	public void setNumberOfLanes(int numberOfLanes) {
-		this.numberOfLanes = numberOfLanes;
 		Integer lanes[] = new Integer[numberOfLanes];
 		for (int i = 0; i < numberOfLanes; i++)
 			lanes[i] = Integer.valueOf(i);

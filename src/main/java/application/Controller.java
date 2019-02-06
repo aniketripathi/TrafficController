@@ -16,8 +16,6 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
-import javafx.scene.control.Dialog;
-import javafx.scene.control.DialogPane;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
@@ -32,13 +30,13 @@ import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import main.java.algorithm.DynamicTrafficLight;
 import main.java.data.config.Config;
 import main.java.data.config.ConfigReader;
 import main.java.data.config.ConfigWriter;
 import main.java.data.recorder.Recorder;
 import main.java.engine.Updater;
 import main.java.engine.VehicleManager;
-import main.java.entities.TrafficLight.LightColor;
 import main.java.exceptions.InvalidConfigException;
 import main.java.exceptions.ProbabilityException;
 import main.java.map.Map;
@@ -103,6 +101,8 @@ public class Controller implements Initializable, ChangeListener<Number> {
 	private Label AQLValueLabel;
 	@FXML
 	private Label AWTValueLabel;
+	@FXML
+	private Label crossingRateValueLabel;
 
 	private Stage parentStage;
 	private Map map;
@@ -113,6 +113,7 @@ public class Controller implements Initializable, ChangeListener<Number> {
 	private Recorder recorder;
 	private File lastDirectory;
 	private FileChooser fileChooser;
+	private DynamicTrafficLight algo;
 
 	@Override
 	public void initialize(URL arg0, ResourceBundle arg1) {
@@ -134,8 +135,18 @@ public class Controller implements Initializable, ChangeListener<Number> {
 		vehicleManager = new VehicleManager();
 		config = new Config(map.getNumberOfLanes());
 		recorder = new Recorder(map.getNumberOfLanes());
-		updater = new Updater(map, canvas, vehicleManager, config, recorder, timerValueLabel, generatedValueLabel,
-				crossedValueLabel, fpsValueLabel, greenTimeValueLabel, AQLValueLabel, AWTValueLabel);
+		updater = new Updater(map, canvas, vehicleManager, config, recorder);
+		updater.setAQLValueLabel(AQLValueLabel);
+		updater.setAWTValueLabel(AWTValueLabel);
+		updater.setGreenTimeValueLabel(greenTimeValueLabel);
+		updater.setFpsValueLabel(fpsValueLabel);
+		updater.setCrossedValueLabel(crossedValueLabel);
+		updater.setGeneratedValueLabel(generatedValueLabel);
+		updater.setTimerValueLabel(timerValueLabel);
+		updater.setCrossingRateValueLabel(crossingRateValueLabel);
+
+		algo = new DynamicTrafficLight();
+		updater.setAlgo(algo);
 		sim = new Simulator(updater);
 		fileChooser = new FileChooser();
 		fileChooser.getExtensionFilters().add(new ExtensionFilter("Text Files", "*.txt"));
@@ -170,6 +181,7 @@ public class Controller implements Initializable, ChangeListener<Number> {
 				config = configController.getConfig();
 				dialogStage.close();
 				updater.setConfig(config);
+				updater.reloadTimers();
 			} catch (ProbabilityException e) {
 				Alert alert = new Alert(AlertType.ERROR, e.getMessage());
 				alert.setHeaderText(null);
@@ -179,6 +191,44 @@ public class Controller implements Initializable, ChangeListener<Number> {
 			}
 		});
 
+		dialogStage.showAndWait();
+
+	}
+
+	public void openOptionsDialog() throws IOException {
+		FXMLLoader fxmlLoader = new FXMLLoader();
+		AnchorPane anchorPane = (AnchorPane) fxmlLoader.load(getClass().getResource("Input_options.fxml").openStream());
+		OptionsDialog optionsController = (OptionsDialog) fxmlLoader.getController();
+		optionsController.setDefaultTime(algo.getDefaultTime());
+		optionsController.setPauseTime(algo.getPauseTime());
+		optionsController.setDynamicParameters(algo.isDynamic(), algo.getMinTime(), algo.getMaxTime());
+
+		Stage dialogStage = new Stage();
+		Scene dialogScene = new Scene(anchorPane, anchorPane.getPrefWidth(), anchorPane.getPrefHeight());
+		dialogStage.setTitle("Options");
+		dialogStage.setScene(dialogScene);
+		dialogStage.setResizable(false);
+		dialogStage.initModality(Modality.APPLICATION_MODAL);
+		optionsController.getCancelButton().setOnAction((evt) -> {
+			dialogStage.close();
+		});
+
+		optionsController.getOKButton().setOnAction((evt) -> {
+			try {
+				algo.setDefaultTime(optionsController.getDefaultTime());
+				algo.setMaxTime(optionsController.getMaxGreenTime());
+				algo.setMinTime(optionsController.getMinGreenTime());
+				algo.setPauseTime(optionsController.getPauseTime());
+				algo.setDynamic(optionsController.isDynamic());
+				dialogStage.close();
+			} catch (NumberFormatException e) {
+				Alert alert = new Alert(AlertType.ERROR, "Invalid values!!");
+				alert.setHeaderText(null);
+				alert.show();
+			}
+		});
+
+		optionsController.updateFields();
 		dialogStage.showAndWait();
 
 	}
@@ -221,10 +271,6 @@ public class Controller implements Initializable, ChangeListener<Number> {
 
 	public void setStage(Stage stage) {
 		this.parentStage = stage;
-	}
-
-	public void resetConfig() {
-		config.reset();
 	}
 
 	@Override

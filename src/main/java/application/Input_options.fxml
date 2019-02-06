@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<AnchorPane xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="main.java.application.OptionsDialog">
+   <children>
+      <VBox layoutY="1.0" minHeight="-Infinity" minWidth="-Infinity" spacing="20.0" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0">
+         <children>
+            <VBox maxWidth="1.7976931348623157E308" spacing="20.0">
+               <children>
+                  <RadioButton fx:id="staticRadioButton" mnemonicParsing="false" text="Static Algorithm" />
+                  <HBox maxWidth="1.7976931348623157E308" spacing="10.0">
+                     <children>
+                        <Label text="Green Time" />
+                        <TextField fx:id="defaultTimeTextField" />
+                     </children>
+                  </HBox>
+               </children>
+            </VBox>
+            <Separator maxWidth="1.7976931348623157E308" />
+            <VBox maxWidth="1.7976931348623157E308" spacing="20.0">
+               <children>
+                  <RadioButton fx:id="dynamicRadioButton" mnemonicParsing="false" text="Dynamic Algorithm" />
+                  <HBox maxWidth="1.7976931348623157E308" spacing="10.0">
+                     <children>
+                        <Label text="Min. Green Time" />
+                        <TextField fx:id="minGreenTimeTextField" />
+                     </children>
+                  </HBox>
+                  <HBox maxWidth="1.7976931348623157E308" spacing="10.0">
+                     <children>
+                        <Label text="Max. Green Time" />
+                        <TextField fx:id="maxGreenTimeTextField" />
+                     </children>
+                  </HBox>
+               </children>
+            </VBox>
+            <Separator maxWidth="1.7976931348623157E308" />
+            <HBox maxWidth="1.7976931348623157E308" minHeight="-Infinity" spacing="10.0">
+               <children>
+                  <Label text="Pause Time" />
+                  <TextField fx:id="pauseTimeTextField" />
+               </children>
+            </HBox>
+            <HBox alignment="TOP_CENTER" maxWidth="1.7976931348623157E308" spacing="50.0">
+               <children>
+                  <Button fx:id="OKButton" mnemonicParsing="false" text="OK" />
+                  <Button fx:id="CancelButton" mnemonicParsing="false" text="Cancel" />
+               </children>
+               <VBox.margin>
+                  <Insets bottom="10.0" left="20.0" right="20.0" top="10.0" />
+               </VBox.margin>
+            </HBox>
+         </children>
+      </VBox>
+   </children>
+</AnchorPane>
