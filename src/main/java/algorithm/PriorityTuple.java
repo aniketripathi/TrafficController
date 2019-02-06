@@ -67,6 +67,7 @@ public class PriorityTuple implements Comparable<PriorityTuple> {
 		return compare;
 	}
 
+	@Override
 	public String toString() {
 		return "[" + queueLength + "," + waitingTime + "," + rate + "]";
 	}
