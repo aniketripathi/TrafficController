@@ -12,7 +12,7 @@ public class Simulator {
 
 		private Updater updater;
 		private long prev = 0;
-		private final long[] frameTimes = new long[25];
+		private final long[] frameTimes = new long[50];
 		private int frameTimeIndex = 0;
 		private boolean arrayFilled = false;
 		private long elapsedFrameNanos;
@@ -85,8 +85,10 @@ public class Simulator {
 	}
 
 	public void play() {
-		animationController.start();
-		updater.start();
+		if (!updater.isStopped()) {
+			animationController.start();
+			updater.start();
+		}
 	}
 
 	public void stop() {
