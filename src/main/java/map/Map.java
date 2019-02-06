@@ -21,7 +21,7 @@ public class Map implements ChangeListener<Number> {
 	private DoubleProperty trafficLightWidth; // with respect to horizontal lane
 	private DoubleProperty dividerWidth;
 	private DoubleProperty laneWidth;
-	private double laneSeparatorWidth; // with respect to horizontal lane
+
 	private double laneSeparatorHeight; // with respect to horizontal lane
 
 	public static final int DEFAULT_NUMBER_OF_LANES = 3;
@@ -34,8 +34,6 @@ public class Map implements ChangeListener<Number> {
 	private Crossing crossing;
 
 	private boolean areLanesEqual;
-
-	private double laneSeparatorSpacing; // width respect to horizontal lane
 
 	private boolean drawWhole;
 
@@ -209,9 +207,6 @@ public class Map implements ChangeListener<Number> {
 				trafficLightHeight);
 
 		laneSeparatorHeight = laneWidth.get() * LANE_TO_LANE_SEPARATOR_WIDTH_RATIO;
-		laneSeparatorWidth = laneWidth.get() * LANE_WIDTH_TO_LANE_SEPARATOR_HEIGHT_RATIO;
-		laneSeparatorSpacing = laneSeparatorWidth;
-
 		/** regions of main.java.map is set .... draw whole **/
 		drawWhole = true;
 
@@ -235,7 +230,12 @@ public class Map implements ChangeListener<Number> {
 		gc.fillRect(0, 0, width.get(), height.get());
 
 		// draw crossing region
-		crossing.getRegion().draw(gc, roadColor, null, 0, false);
+		gc.setFill(roadColor);
+		double width = crossing.getRegion().getWidth(), height = crossing.getRegion().getHeight(),
+				x = crossing.getRegion().getX(), y = crossing.getRegion().getY();
+		gc.fillRoundRect(x - width / 2, y - height / 2, width, height, (width - laneWidth.get()) / 2,
+				(height - laneWidth.get()) / 2);
+		// crossing.getRegion().draw(gc, roadColor, null, 0, false);
 
 		// draw lanes
 

@@ -2,8 +2,6 @@ package main.java.map;
 
 import java.util.LinkedList;
 import java.util.ListIterator;
-import main.java.entities.BackwardLane;
-import main.java.entities.ForwardLane;
 import main.java.entities.Vehicle;
 import main.java.util.Region;
 
