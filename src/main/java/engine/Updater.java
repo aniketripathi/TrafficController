@@ -14,13 +14,11 @@ import main.java.data.recorder.Recorder;
 import main.java.entities.BackwardLane;
 import main.java.entities.ForwardLane;
 import main.java.entities.Road;
-import main.java.entities.TrafficLight;
 import main.java.entities.TrafficLight.LightColor;
 import main.java.entities.Vehicle;
 import main.java.entities.Vehicle.Type;
 import main.java.map.Map;
 import main.java.simulator.Simulator;
-import main.java.util.CountdownTimer;
 import main.java.util.CountdownTimerEvent;
 import main.java.util.MathEngine;
 import main.java.util.SerialCountdown;
@@ -43,11 +41,11 @@ public class Updater implements ChangeListener<Number> {
 	private DynamicTrafficLight algo;
 	private int greenRoad;
 
+	private float crossingRate;
 	private float averageQueueLength;
 	private float averageWaitingTime;
 	private long roadsWaitingTime[];
 	private float frameRate = Simulator.EXPECTED_FPS;
-	private long trafficTimerNanos;
 	private final long switchTime = (long) (Timer.SECOND_TO_NANOS * 1.5);
 
 	private boolean initialized;
@@ -61,6 +59,7 @@ public class Updater implements ChangeListener<Number> {
 	private Label greenTimeValueLabel;
 	private Label AQLValueLabel;
 	private Label AWTValueLabel;
+	private Label crossingRateValueLabel;
 
 	double canvasWidth;
 	double canvasTranslateY = 0;
@@ -90,24 +89,14 @@ public class Updater implements ChangeListener<Number> {
 			this.i = i;
 		}
 
+		@Override
 		public void run() {
 			map.getRoad(i).getTrafficLight().setColor(LightColor.RED);
 			roadsWaitingTime[i] = timer.getElapsedNanos();
 		}
 	}
 
-	public Updater(Map map, Canvas canvas, VehicleManager vehicleManager, Config config, Recorder recorder,
-			Label timerValueLabel, Label generatedValueLabel, Label crossedValueLabel, Label fpsValueLabel,
-			Label greenTimeValueLabel, Label AQLValueLabel, Label AWTValueLabel) {
-
-		this.algo = new DynamicTrafficLight();
-		this.timerValueLabel = timerValueLabel;
-		this.generatedValueLabel = generatedValueLabel;
-		this.crossedValueLabel = crossedValueLabel;
-		this.fpsValueLabel = fpsValueLabel;
-		this.greenTimeValueLabel = greenTimeValueLabel;
-		this.AQLValueLabel = AQLValueLabel;
-		this.AWTValueLabel = AWTValueLabel;
+	public Updater(Map map, Canvas canvas, VehicleManager vehicleManager, Config config, Recorder recorder) {
 
 		this.averageQueueLength = 0;
 		this.averageWaitingTime = 0;
@@ -145,6 +134,21 @@ public class Updater implements ChangeListener<Number> {
 			map.getRoad(i).getTrafficLight().setCountdownTimerEvent(new TrafficTimerEvent(i));
 		}
 
+	}
+
+	public void reloadTimers() {
+		for (int i = 0; i < Map.NUMBER_OF_ROADS; i++) {
+			for (int j = 0; j < map.getNumberOfLanes(); j++) {
+				setGenerateVehicle(i, j, true);
+				vehicleGenerationTimer[i][j].setCountdown(
+						(long) (Timer.SECOND_TO_NANOS / config.getRoadProperty(i).getLaneProperty(j).getRate()),
+						generateVehicleEvent[i][j]);
+			}
+		}
+	}
+
+	public void setAlgo(DynamicTrafficLight algo) {
+		this.algo = algo;
 	}
 
 	private boolean getGenerateVehicle(int i, int j) {
@@ -190,6 +194,7 @@ public class Updater implements ChangeListener<Number> {
 		/** Vehicle Generation **/
 		int temp = 0;
 		float waitingTime = 0;
+		int count = 0;
 		for (int i = 0; i < Map.NUMBER_OF_ROADS; i++) {
 			for (int j = 0; j < map.getNumberOfLanes(); j++) {
 				if (getGenerateVehicle(i, j)) {
@@ -199,10 +204,16 @@ public class Updater implements ChangeListener<Number> {
 				temp += map.getRoad(i).getForwardLane(j).getQueueSize();
 				map.getRoad(i).getForwardLane(j).updateQueues();
 			}
-			waitingTime += (timer.getElapsedNanos() - this.roadsWaitingTime[i]) / Timer.SECOND_TO_NANOS;
+			if (greenRoad != i) {
+				waitingTime += (timer.getElapsedNanos() - this.roadsWaitingTime[i]) / Timer.SECOND_TO_NANOS;
+				++count;
+			}
 		}
-		this.averageQueueLength = ((float) temp) / ((float) Map.NUMBER_OF_ROADS * map.getNumberOfLanes());
-		this.averageWaitingTime = waitingTime / (Map.NUMBER_OF_ROADS);
+		this.averageQueueLength = (temp) / ((float) Map.NUMBER_OF_ROADS * map.getNumberOfLanes());
+		this.averageWaitingTime = waitingTime / (count);
+		if ((timer.getElapsedNanos() / (float) 1_000_000_000) > 0)
+			this.crossingRate = ((recorder.getCrossingCount().getTotalCrossedCount().getTotalCount()))
+					/ (timer.getElapsedNanos() / (float) 1_000_000_000);
 		updateVehicles();
 		updateLabels();
 		updateTuples();
@@ -223,7 +234,8 @@ public class Updater implements ChangeListener<Number> {
 			if (i == this.greenRoad) {
 				waitingTime = 0;
 			} else {
-				waitingTime = (timer.getElapsedNanos() - this.roadsWaitingTime[i]) * 1.0f / Timer.SECOND_TO_NANOS;
+				waitingTime = (timer.getElapsedNanos() - this.roadsWaitingTime[i]) * algo.getPauseTime()
+						/ Timer.SECOND_TO_NANOS;
 			}
 
 			algo.updateRoadsInfo(i, map.getRoad(i).getForwardLane(lane).getQueueSize(), waitingTime,
@@ -245,7 +257,7 @@ public class Updater implements ChangeListener<Number> {
 			}
 		}
 
-		if (trafficTimer.isCountdownTerminated()) {
+		if (!trafficTimer.isCountdownInitialized() || trafficTimer.isCountdownTerminated()) {
 			if (switchTimer.isCountdownInitialized()) {
 				switchTimer.start();
 			}
@@ -254,9 +266,9 @@ public class Updater implements ChangeListener<Number> {
 			if (switchTimer.isCountdownTerminated()) {
 				switchTimer.resetCountdown();
 				switchTimer.setCountdown(switchTime, null);
-				Pair<Integer, Float> pair = algo.staticTrafficLightAlgorithm();
+				Pair<Integer, Float> pair = (algo.isDynamic()) ? algo.dynamicTrafficLightAlgorithm()
+						: algo.staticTrafficLightAlgorithm();
 				greenRoad = pair.getKey();
-				trafficTimerNanos = (long) (pair.getValue() * Timer.SECOND_TO_NANOS);
 				map.getRoad(pair.getKey()).getTrafficLight().setColor(LightColor.GREEN);
 				trafficTimer.resetCountdown();
 				trafficTimer.setCountdown((long) (pair.getValue() * Timer.SECOND_TO_NANOS),
@@ -268,15 +280,16 @@ public class Updater implements ChangeListener<Number> {
 
 	private void updateLabels() {
 
-		this.AQLValueLabel.setText(String.format("%.3f", this.averageQueueLength));
-		this.AWTValueLabel.setText(String.format("%.3f", this.averageWaitingTime));
+		this.AQLValueLabel.setText(String.format("%.2f", this.averageQueueLength));
+		this.AWTValueLabel.setText(String.format("%.2f", this.averageWaitingTime));
 
-		timerValueLabel.setText(String.format("%.3f", timer.getElapsedNanos() / (double) 1_000_000_000));
+		crossingRateValueLabel.setText(String.format("%.2f", crossingRate));
+		timerValueLabel.setText(String.format("%.2f", timer.getElapsedNanos() / (float) 1_000_000_000));
 		generatedValueLabel.setText(Long.toString(recorder.getGenerated()));
 		crossedValueLabel.setText(Long.toString(recorder.getCrossingCount().getTotalCrossedCount().getTotalCount()));
-		this.fpsValueLabel.setText(String.format("%.1f", this.getFrameRate()));
+		this.fpsValueLabel.setText(String.format("%.2f", this.getFrameRate()));
 		this.greenTimeValueLabel
-				.setText(String.format("%.2f", trafficTimer.getCountdownRemaining() / (double) 1_000_000_000));
+				.setText(String.format("%.2f", trafficTimer.getCountdownRemaining() / (float) 1_000_000_000));
 	}
 
 	private void updateVehicles() {
@@ -509,12 +522,6 @@ public class Updater implements ChangeListener<Number> {
 			updateTuples();
 			switchTimer.resetCountdown();
 			switchTimer.setCountdown(switchTime, null);
-			Pair<Integer, Float> pair = algo.staticTrafficLightAlgorithm();
-			greenRoad = pair.getKey();
-			map.getRoad(pair.getKey()).getTrafficLight().setColor(LightColor.GREEN);
-			trafficTimer.resetCountdown();
-			trafficTimer.setCountdown((long) (pair.getValue() * Timer.SECOND_TO_NANOS),
-					map.getRoad(pair.getKey()).getTrafficLight().getCountdownTimerEvent());
 
 		}
 	}
@@ -566,6 +573,38 @@ public class Updater implements ChangeListener<Number> {
 			}
 			isPaused = true;
 		}
+	}
+
+	public void setFpsValueLabel(Label fpsValueLabel) {
+		this.fpsValueLabel = fpsValueLabel;
+	}
+
+	public void setCrossingRateValueLabel(Label crossingRateValueLabel) {
+		this.crossingRateValueLabel = crossingRateValueLabel;
+	}
+
+	public void setTimerValueLabel(Label timerValueLabel) {
+		this.timerValueLabel = timerValueLabel;
+	}
+
+	public void setGeneratedValueLabel(Label generatedValueLabel) {
+		this.generatedValueLabel = generatedValueLabel;
+	}
+
+	public void setCrossedValueLabel(Label crossedValueLabel) {
+		this.crossedValueLabel = crossedValueLabel;
+	}
+
+	public void setGreenTimeValueLabel(Label greenTimeValueLabel) {
+		this.greenTimeValueLabel = greenTimeValueLabel;
+	}
+
+	public void setAQLValueLabel(Label aQLValueLabel) {
+		AQLValueLabel = aQLValueLabel;
+	}
+
+	public void setAWTValueLabel(Label aWTValueLabel) {
+		AWTValueLabel = aWTValueLabel;
 	}
 
 	public void setConfig(Config config) {
