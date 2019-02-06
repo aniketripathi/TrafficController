@@ -12,10 +12,10 @@ public class LaneProperty {
 	private FloatProperty heavyVehicleProbability;
 	private FloatProperty rate;
 
-	public static final float DEFAULT_CAR_PROBABILITY = 0.8f;
-	public static final float DEFAULT_TWO_WHEELER_PROBABILITY = 0.15f;
-	public static final float DEFAULT_HEAVY_VEHICLE_PROBABILITY = 0.05f;
-	public static final float DEFAULT_RATE = 1.8f;
+	public static final float DEFAULT_CAR_PROBABILITY = 0.6f;
+	public static final float DEFAULT_TWO_WHEELER_PROBABILITY = 0.3f;
+	public static final float DEFAULT_HEAVY_VEHICLE_PROBABILITY = 0.1f;
+	public static final float DEFAULT_RATE = 0.4f;
 
 	public LaneProperty() {
 

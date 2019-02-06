@@ -37,10 +37,8 @@ public class RoadProperty {
 
 	public void validate() throws ProbabilityException {
 
-		double sumOfLanesRate = 0;
 		for (LaneProperty lane : lanesProperty) {
 			lane.validate();
-			sumOfLanesRate += lane.getRate();
 		}
 
 	}
