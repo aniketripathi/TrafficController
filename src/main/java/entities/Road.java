@@ -48,8 +48,6 @@ public class Road {
 	private BackwardLane[] backwardLanes;
 	private TrafficLight trafficLight;
 	private Region divider;
-	private int queueLength;
-	private float rate;
 
 	public Road(int numberOfLanes, TYPE type) {
 		if (numberOfLanes < 1)

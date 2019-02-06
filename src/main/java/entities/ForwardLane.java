@@ -4,7 +4,6 @@ import java.util.LinkedList;
 import java.util.ListIterator;
 
 import javafx.geometry.Point2D;
-import javafx.scene.shape.Line;
 import main.java.util.MathEngine;
 
 public class ForwardLane extends Lane {
@@ -19,7 +18,7 @@ public class ForwardLane extends Lane {
 
 	private LinkedList<Vehicle> bufferQueue;
 
-	private final int BUFFER_LIMIT = 200;
+	private final int BUFFER_LIMIT = 300;
 
 	public ForwardLane(Road road, int index) {
 		super(road, index);
@@ -67,6 +66,7 @@ public class ForwardLane extends Lane {
 		return super.isEmpty() && bufferQueue.isEmpty();
 	}
 
+	@Override
 	public int getQueueSize() {
 		return super.getQueueSize() + bufferQueue.size();
 	}
